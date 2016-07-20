@@ -920,7 +920,7 @@ void cmGlobalNinjaGenerator::AppendTargetDependsClosure(
   }
   std::set<cmGeneratorTarget const*> const& targets = i->second;
   cmNinjaDeps outs;
-  for (std::set<cmGeneratorTarget const*>::iterator ti = targets.begin();
+  for (std::set<cmGeneratorTarget const*>::const_iterator ti = targets.begin();
        ti != targets.end(); ++ti) {
     this->AppendTargetOutputs(*ti, outs);
   }
