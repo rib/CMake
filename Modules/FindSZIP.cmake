@@ -62,22 +62,19 @@ function(_SZIP_get_version)
 endfunction()
 
 # If the root dir is explicitly specified, then ONLY look there
+message("SZIP_ROOT_DIR: ${SZIP_ROOT_DIR}")
+message("ENV{SZIP_INSTALL}: $ENV{SZIP_INSTALL}")
 if(SZIP_ROOT_DIR)
-  set(SZIP_SEARCH_OPTS NO_DEFAULT_PATH)
-else()
-  # Otherwise initialize from an environment variable
-  set(SZIP_ROOT_DIR $ENV{SZIP_INSTALL})
-endif()
-
-# If we do have a root dir, use it as a hint
-if(SZIP_ROOT_DIR)
-  set(SZIP_SEARCH_PATHS HINTS ${SZIP_ROOT_DIR})
+  set(SZIP_SEARCH_OPTS PATHS ${SZIP_ROOT_DIR} NO_DEFAULT_PATH)
+elseif(NOT ("$ENV{SZIP_INSTALL}" STREQUAL ""))
+  message("DEBUG: ENV{SZIP_INSTALL}")
+  set(SZIP_SEARCH_OPTS HINTS ENV SZIP_INSTALL)
 endif()
 
 # Find the main header
 find_path(SZIP_INCLUDE_DIR NAMES szlib.h
-  ${SZIP_SEARCH_PATHS} ${SZIP_SEARCH_OPTS}
-  PATH_SUFFIXES include include/szip Include Include/szip)
+  ${SZIP_SEARCH_OPTS} PATH_SUFFIXES include include/szip Include Include/szip)
+mark_as_advanced(SZIP_INCLUDE_DIR)
 
 # Find the release library
 set(SZIP_LIBRARY_RELEASE_NAMES sz szip)
@@ -85,8 +82,7 @@ if(WIN32)
   list(APPEND SZIP_LIBRARY_RELEASE_NAMES libsz libszip)
 endif()
 find_library(SZIP_LIBRARY_RELEASE NAMES ${SZIP_LIBRARY_RELEASE_NAMES}
-  ${SZIP_SEARCH_PATHS} ${SZIP_SEARCH_OPTS}
-  PATH_SUFFIXES lib Lib)
+  ${SZIP_SEARCH_OPTS} PATH_SUFFIXES lib Lib)
 
 # Find the debug library
 set(SZIP_LIBRARY_DEBUG_NAMES sz_d szip_d)
@@ -94,13 +90,12 @@ if(WIN32)
   list(APPEND SZIP_LIBARY_DEBUG_NAMES libsz_d libszip_d)
 endif()
 find_library(SZIP_LIBRARY_DEBUG NAMES ${SZIP_LIBRARY_DEBUG_NAMES}
-  ${SZIP_SEARCH_PATHS} ${SZIP_SEARCH_OPTS}
-  PATH_SUFFIXES lib Lib)
+  ${SZIP_SEARCH_OPTS} PATH_SUFFIXES lib Lib)
 
 include(SelectLibraryConfigurations)
 select_library_configurations(SZIP)
 
-if(SZIP_INCLUDE_DIR AND SZIP_LIBRARY)
+if(SZIP_INCLUDE_DIR)
   _SZIP_get_version()
 endif()
 
