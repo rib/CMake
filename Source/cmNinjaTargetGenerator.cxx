@@ -529,7 +529,8 @@ void cmNinjaTargetGenerator::WriteObjectBuildStatement(
   cmSourceFile const* source, bool writeOrderDependsTargetForTarget)
 {
   std::string const language = source->GetLanguage();
-  std::string const sourceFileName = source->GetFullPath();
+  std::string const sourceFileName =
+    language == "RC" ? source->GetFullPath() : this->GetSourceFilePath(source);
   std::string const objectDir =
     this->ConvertToNinjaPath(this->GeneratorTarget->GetSupportDirectory());
   std::string const objectFileName =
