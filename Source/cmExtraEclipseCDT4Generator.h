@@ -35,7 +35,7 @@ public:
 
   cmExtraEclipseCDT4Generator();
 
-  static cmExternalMakefileProjectGeneratorFactory* NewFactory();
+  static cmExternalMakefileProjectGeneratorFactory* GetFactory();
 
   void EnableLanguage(std::vector<std::string> const& languages, cmMakefile*,
                       bool optional) CM_OVERRIDE;

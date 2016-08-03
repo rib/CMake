@@ -35,7 +35,7 @@ cmExtraCodeLiteGenerator::cmExtraCodeLiteGenerator()
 }
 
 cmExternalMakefileProjectGeneratorFactory*
-cmExtraCodeLiteGenerator::NewFactory()
+cmExtraCodeLiteGenerator::GetFactory()
 {
   static cmExternalMakefileProjectGeneratorSimpleFactory<
     cmExtraCodeLiteGenerator>

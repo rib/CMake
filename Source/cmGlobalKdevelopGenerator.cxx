@@ -31,7 +31,7 @@ cmGlobalKdevelopGenerator::cmGlobalKdevelopGenerator()
 }
 
 cmExternalMakefileProjectGeneratorFactory*
-cmGlobalKdevelopGenerator::NewFactory()
+cmGlobalKdevelopGenerator::GetFactory()
 {
   static cmExternalMakefileProjectGeneratorSimpleFactory<
     cmGlobalKdevelopGenerator>

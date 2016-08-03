@@ -27,7 +27,7 @@ class cmGeneratorTarget;
 class cmExtraSublimeTextGenerator : public cmExternalMakefileProjectGenerator
 {
 public:
-  static cmExternalMakefileProjectGeneratorFactory* NewFactory();
+  static cmExternalMakefileProjectGeneratorFactory* GetFactory();
   typedef std::map<std::string, std::vector<std::string> > MapSourceFileFlags;
   cmExtraSublimeTextGenerator();
 

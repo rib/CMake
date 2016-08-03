@@ -27,7 +27,7 @@ cmExtraKateGenerator::cmExtraKateGenerator()
 {
 }
 
-cmExternalMakefileProjectGeneratorFactory* cmExtraKateGenerator::NewFactory()
+cmExternalMakefileProjectGeneratorFactory* cmExtraKateGenerator::GetFactory()
 {
   static cmExternalMakefileProjectGeneratorSimpleFactory<cmExtraKateGenerator>
     factory("Kate", "Generates Kate project files.");

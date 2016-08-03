@@ -26,7 +26,7 @@ class cmExtraKateGenerator : public cmExternalMakefileProjectGenerator
 public:
   cmExtraKateGenerator();
 
-  static cmExternalMakefileProjectGeneratorFactory* NewFactory();
+  static cmExternalMakefileProjectGeneratorFactory* GetFactory();
 
   void Generate() CM_OVERRIDE;
 

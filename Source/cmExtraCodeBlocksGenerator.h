@@ -28,7 +28,7 @@ class cmExtraCodeBlocksGenerator : public cmExternalMakefileProjectGenerator
 public:
   cmExtraCodeBlocksGenerator();
 
-  static cmExternalMakefileProjectGeneratorFactory* NewFactory();
+  static cmExternalMakefileProjectGeneratorFactory* GetFactory();
 
   void Generate() CM_OVERRIDE;
 

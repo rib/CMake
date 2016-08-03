@@ -33,7 +33,7 @@ class cmGlobalKdevelopGenerator : public cmExternalMakefileProjectGenerator
 public:
   cmGlobalKdevelopGenerator();
 
-  static cmExternalMakefileProjectGeneratorFactory* NewFactory();
+  static cmExternalMakefileProjectGeneratorFactory* GetFactory();
 
   void Generate() CM_OVERRIDE;
 
