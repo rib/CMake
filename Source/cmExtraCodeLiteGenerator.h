@@ -36,7 +36,7 @@ protected:
 public:
   cmExtraCodeLiteGenerator();
 
-  static cmExternalMakefileProjectGeneratorFactory* NewFactory();
+  static cmExternalMakefileProjectGeneratorFactory* GetFactory();
 
   void Generate() CM_OVERRIDE;
   void CreateProjectFile(const std::vector<cmLocalGenerator*>& lgs);

@@ -39,7 +39,7 @@ http://sublimetext.info/docs/en/reference/build_systems.html
 */
 
 cmExternalMakefileProjectGeneratorFactory*
-cmExtraSublimeTextGenerator::NewFactory()
+cmExtraSublimeTextGenerator::GetFactory()
 {
   static cmExternalMakefileProjectGeneratorSimpleFactory<
     cmExtraSublimeTextGenerator>

@@ -42,7 +42,7 @@ cmExtraCodeBlocksGenerator::cmExtraCodeBlocksGenerator()
 }
 
 cmExternalMakefileProjectGeneratorFactory*
-cmExtraCodeBlocksGenerator::NewFactory()
+cmExtraCodeBlocksGenerator::GetFactory()
 {
   static cmExternalMakefileProjectGeneratorSimpleFactory<
     cmExtraCodeBlocksGenerator>

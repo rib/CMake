@@ -55,7 +55,7 @@ cmExtraEclipseCDT4Generator::cmExtraEclipseCDT4Generator()
 }
 
 cmExternalMakefileProjectGeneratorFactory*
-cmExtraEclipseCDT4Generator::NewFactory()
+cmExtraEclipseCDT4Generator::GetFactory()
 {
   static cmExternalMakefileProjectGeneratorSimpleFactory<
     cmExtraEclipseCDT4Generator>

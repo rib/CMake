@@ -796,17 +796,17 @@ int cmake::AddCMakePaths()
 void cmake::AddDefaultExtraGenerators()
 {
 #if defined(CMAKE_BUILD_WITH_CMAKE)
-  this->ExtraGenerators.push_back(cmExtraCodeBlocksGenerator::NewFactory());
-  this->ExtraGenerators.push_back(cmExtraCodeLiteGenerator::NewFactory());
-  this->ExtraGenerators.push_back(cmExtraSublimeTextGenerator::NewFactory());
-  this->ExtraGenerators.push_back(cmExtraKateGenerator::NewFactory());
+  this->ExtraGenerators.push_back(cmExtraCodeBlocksGenerator::GetFactory());
+  this->ExtraGenerators.push_back(cmExtraCodeLiteGenerator::GetFactory());
+  this->ExtraGenerators.push_back(cmExtraSublimeTextGenerator::GetFactory());
+  this->ExtraGenerators.push_back(cmExtraKateGenerator::GetFactory());
 
 #ifdef CMAKE_USE_ECLIPSE
-  this->ExtraGenerators.push_back(cmExtraEclipseCDT4Generator::NewFactory());
+  this->ExtraGenerators.push_back(cmExtraEclipseCDT4Generator::GetFactory());
 #endif
 
 #ifdef CMAKE_USE_KDEVELOP
-  this->ExtraGenerators.push_back(cmGlobalKdevelopGenerator::NewFactory());
+  this->ExtraGenerators.push_back(cmGlobalKdevelopGenerator::GetFactory());
 #endif
 #endif
 }
