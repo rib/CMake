@@ -18,7 +18,7 @@ endif()
 
 # Guard against multiple messages
 if(NOT __CrayLinuxEnvironment_message)
-  set(__CrayLinuxEnvironment_message 1 CACHE BOOL "" FORCE)
+  set(__CrayLinuxEnvironment_message 1 CACHE INTERNAL "")
   if(NOT CMAKE_SYSTEM_VERSION)
     message(STATUS "CrayLinuxEnvironment: Unable to determine CLE version.  This platform file should only be used from inside the Cray Linux Environment for targeting compute nodes (NIDs).")
   else()
