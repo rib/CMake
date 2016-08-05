@@ -367,10 +367,8 @@ bool cmCTest::ShouldCompressTestOutput()
     std::string cdashVersion = this->GetCDashVersion();
     // version >= 1.6?
     bool cdashSupportsGzip =
-      cmSystemTools::VersionCompare(cmSystemTools::OP_GREATER,
-                                    cdashVersion.c_str(), "1.6") ||
-      cmSystemTools::VersionCompare(cmSystemTools::OP_EQUAL,
-                                    cdashVersion.c_str(), "1.6");
+      cmSystemTools::VersionCompare(cmSystemTools::OP_GREATER_EQUAL,
+        cdashVersion.c_str(), "1.6");
     this->CompressTestOutput &= cdashSupportsGzip;
     this->ComputedCompressTestOutput = true;
   }
