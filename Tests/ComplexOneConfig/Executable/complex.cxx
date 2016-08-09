@@ -509,13 +509,15 @@ int main()
 #endif
 
 #ifdef SHOULD_NOT_BE_DEFINED_LESS_EQUAL
-  cmFailed("IF or SET is broken, SHOULD_NOT_BE_DEFINED_LESS_EQUAL is defined.");
+  cmFailed(
+    "IF or SET is broken, SHOULD_NOT_BE_DEFINED_LESS_EQUAL is defined.");
 #else
   cmPassed("SHOULD_NOT_BE_DEFINED_LESS_EQUAL is not defined.");
 #endif
 
 #ifndef SHOULD_BE_DEFINED_LESS_EQUAL
-  cmFailed("IF or SET is broken, SHOULD_BE_DEFINED_LESS_EQUAL is not defined.");
+  cmFailed(
+    "IF or SET is broken, SHOULD_BE_DEFINED_LESS_EQUAL is not defined.");
 #else
   cmPassed("SHOULD_BE_DEFINED_LESS_EQUAL is defined.");
 #endif
@@ -615,13 +617,15 @@ int main()
 #endif
 
 #ifdef SHOULD_NOT_BE_DEFINED_STRGREATER
-  cmFailed("IF or SET is broken, SHOULD_NOT_BE_DEFINED_STRGREATER is defined.");
+  cmFailed(
+    "IF or SET is broken, SHOULD_NOT_BE_DEFINED_STRGREATER is defined.");
 #else
   cmPassed("SHOULD_NOT_BE_DEFINED_STRGREATER is not defined.");
 #endif
 
 #ifndef SHOULD_BE_DEFINED_STRGREATER
-  cmFailed("IF or SET is broken, SHOULD_BE_DEFINED_STRGREATER is not defined.");
+  cmFailed(
+    "IF or SET is broken, SHOULD_BE_DEFINED_STRGREATER is not defined.");
 #else
   cmPassed("SHOULD_BE_DEFINED_STRGREATER is defined.");
 #endif
@@ -697,29 +701,29 @@ int main()
 #endif
 
 #ifdef SHOULD_NOT_BE_DEFINED_STRGREATER_EQUAL2
-  cmFailed(
-    "IF or SET is broken, SHOULD_NOT_BE_DEFINED_STRGREATER_EQUAL2 is defined.");
+  cmFailed("IF or SET is broken, SHOULD_NOT_BE_DEFINED_STRGREATER_EQUAL2 is "
+           "defined.");
 #else
   cmPassed("SHOULD_NOT_BE_DEFINED_STRGREATER_EQUAL2 is not defined.");
 #endif
 
 #ifndef SHOULD_BE_DEFINED_STRGREATER_EQUAL2
-  cmFailed(
-    "IF or SET is broken, SHOULD_BE_DEFINED_STRGREATER_EQUAL2 is not defined.");
+  cmFailed("IF or SET is broken, SHOULD_BE_DEFINED_STRGREATER_EQUAL2 is not "
+           "defined.");
 #else
   cmPassed("SHOULD_BE_DEFINED_STRGREATER_EQUAL2 is defined.");
 #endif
 
 #ifdef SHOULD_NOT_BE_DEFINED_STRGREATER_EQUAL3
-  cmFailed(
-    "IF or SET is broken, SHOULD_NOT_BE_DEFINED_STRGREATER_EQUAL3 is defined.");
+  cmFailed("IF or SET is broken, SHOULD_NOT_BE_DEFINED_STRGREATER_EQUAL3 is "
+           "defined.");
 #else
   cmPassed("SHOULD_NOT_BE_DEFINED_STRGREATER_EQUAL3 is not defined.");
 #endif
 
 #ifndef SHOULD_BE_DEFINED_STRGREATER_EQUAL3
-  cmFailed(
-    "IF or SET is broken, SHOULD_BE_DEFINED_STRGREATER_EQUAL3 is not defined.");
+  cmFailed("IF or SET is broken, SHOULD_BE_DEFINED_STRGREATER_EQUAL3 is not "
+           "defined.");
 #else
   cmPassed("SHOULD_BE_DEFINED_STRGREATER_EQUAL3 is defined.");
 #endif
