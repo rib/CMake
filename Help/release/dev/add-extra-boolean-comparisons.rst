@@ -1,5 +1,6 @@
 add-extra-boolean-comparisons
 -----------------------------
 
-* Add LESS_EQUAL, GREATER_EQUAL, and thier associated STR and VERSION
-  equivalents to use the combined <= and >= functionality.
+* The :command:`if` command gained new boolean comparison operations
+  ``LESS_EQUAL``, ``GREATER_EQUAL``, ``STRLESS_EQUAL``, ``STRGREATER_EQUAL``,
+  ``VERSION_LESS_EQUAL``, and ``VERSION_GREATER_EQUAL``.
