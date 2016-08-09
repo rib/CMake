@@ -1331,6 +1331,10 @@ bool cmQtAutoGenerators::GenerateQrc(const std::string& qrcInputFile,
     // Remove "qrc_" at string begin
     symbolName.erase(0, 4);
   }
+  // Replace '-' with '_'. The former is valid for
+  // file names but not for symbol names.
+  std::replace(symbolName.begin(), symbolName.end(), '-', '_');
+
   const std::string qrcBuildFile = this->Builddir + qrcOutputFile;
 
   int sourceNewerThanQrc = 0;

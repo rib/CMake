@@ -126,18 +126,18 @@ std::string cmFilePathUuid::GetChecksumString(
       for (unsigned int jj = 0; jj != 2; ++jj) {
         const unsigned char nibble = hexHash[ii * 2 + jj];
         if ('0' <= nibble && nibble <= '9') {
-          hbyte[jj] = nibble - '0';
+          hbyte[jj] = static_cast<unsigned char>(nibble - '0');
         } else if ('a' <= nibble && nibble <= 'f') {
-          hbyte[jj] = nibble - 'a' + 10;
+          hbyte[jj] = static_cast<unsigned char>(nibble - 'a' + 10);
         } else if ('A' <= nibble && nibble <= 'f') {
-          hbyte[jj] = nibble - 'A' + 10;
+          hbyte[jj] = static_cast<unsigned char>(nibble - 'A' + 10);
         } else {
           // Unexpected non hex character
           std::cerr << "Unexpected non hex character in checksum string";
           exit(-1);
         }
       }
-      hashBytes[ii] = hbyte[1] | (hbyte[0] << 4);
+      hashBytes[ii] = static_cast<unsigned char>(hbyte[1] | (hbyte[0] << 4));
     }
   }
   // Convert hash bytes to Base64 text string
