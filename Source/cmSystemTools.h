@@ -284,10 +284,10 @@ public:
 
   enum CompareOp
   {
-    OP_EQUAL   = 1,
-    OP_LESS    = 2,
+    OP_EQUAL = 1,
+    OP_LESS = 2,
     OP_GREATER = 4,
-    OP_LESS_EQUAL    = OP_LESS | OP_EQUAL,
+    OP_LESS_EQUAL = OP_LESS | OP_EQUAL,
     OP_GREATER_EQUAL = OP_GREATER | OP_EQUAL
   };
 
