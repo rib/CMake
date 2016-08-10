@@ -158,7 +158,7 @@ std::vector<unsigned char> cmCryptoHashMD5::Finalize()
   }                                                                           \
   std::vector<unsigned char> cmCryptoHash##SHA::Finalize()                    \
   {                                                                           \
-    std::vector<unsigned char> hash(SHA##_DIGEST_STRING_LENGTH, 0);           \
+    std::vector<unsigned char> hash(SHA##_DIGEST_LENGTH, 0);                  \
     SHA##_Final(&hash[0], this->SHA);                                         \
     return hash;                                                              \
   }
