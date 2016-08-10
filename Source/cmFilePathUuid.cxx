@@ -111,46 +111,22 @@ std::string cmFilePathUuid::GetChecksumString(
   const std::string& sourceFilename, const std::string& sourceRelPath,
   const std::string& sourceRelSeed)
 {
-  // Calculate the file ( seed + relative path + name ) checksum
   std::string checksumBase64;
-
-  std::vector<unsigned char> hashBytes;
   {
-    // Acquire hash in a hex value string
-    std::string hexHash = cmCryptoHash::New("SHA256")->HashString(
-      (sourceRelSeed + sourceRelPath + sourceFilename).c_str());
-    // Convert hex value string to bytes
-    hashBytes.resize(hexHash.size() / 2);
-    for (unsigned int ii = 0; ii != hashBytes.size(); ++ii) {
-      unsigned char hbyte[2] = { 0, 0 };
-      for (unsigned int jj = 0; jj != 2; ++jj) {
-        const unsigned char nibble = hexHash[ii * 2 + jj];
-        if ('0' <= nibble && nibble <= '9') {
-          hbyte[jj] = static_cast<unsigned char>(nibble - '0');
-        } else if ('a' <= nibble && nibble <= 'f') {
-          hbyte[jj] = static_cast<unsigned char>(nibble - 'a' + 10);
-        } else if ('A' <= nibble && nibble <= 'f') {
-          hbyte[jj] = static_cast<unsigned char>(nibble - 'A' + 10);
-        } else {
-          // Unexpected non hex character
-          std::cerr << "Unexpected non hex character in checksum string";
-          exit(-1);
-        }
-      }
-      hashBytes[ii] = static_cast<unsigned char>(hbyte[1] | (hbyte[0] << 4));
-    }
-  }
-  // Convert hash bytes to Base64 text string
-  {
+    // Calculate the file ( seed + relative path + name ) checksum
+    std::vector<unsigned char> hashBytes =
+      cmCryptoHash::New("SHA256")->ByteHashString(
+        (sourceRelSeed + sourceRelPath + sourceFilename).c_str());
+    // Convert hash bytes to Base64 text string
     std::vector<unsigned char> base64Bytes(hashBytes.size() * 2, 0);
     cmsysBase64_Encode(&hashBytes[0], hashBytes.size(), &base64Bytes[0], 0);
     checksumBase64 = reinterpret_cast<const char*>(&base64Bytes[0]);
-    // Base64 allows '+' and '/' characters.
-    // Both are problematic when used in file names.
-    // Replace them with safer alternatives.
-    std::replace(checksumBase64.begin(), checksumBase64.end(), '+', '_');
-    std::replace(checksumBase64.begin(), checksumBase64.end(), '/', '-');
   }
+  // Base64 allows '/', '+' and '=' characters which are problematic
+  // when used in file names. Replace them with safer alternatives.
+  std::replace(checksumBase64.begin(), checksumBase64.end(), '/', '-');
+  std::replace(checksumBase64.begin(), checksumBase64.end(), '+', '_');
+  std::replace(checksumBase64.begin(), checksumBase64.end(), '=', '_');
 
   return checksumBase64;
 }
