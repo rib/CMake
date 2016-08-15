@@ -11,6 +11,7 @@
 ============================================================================*/
 #include "cmExecuteProcessCommand.h"
 
+#include "cmProcessOutput.hxx"
 #include "cmSystemTools.h"
 
 #include <cmsys/Process.h>
@@ -228,17 +229,21 @@ bool cmExecuteProcessCommand::InitialPass(std::vector<std::string> const& args,
   int length;
   char* data;
   int p;
+  cmProcessOutput processOutput;
+  std::string strdata;
   while ((p = cmsysProcess_WaitForData(cp, &data, &length, CM_NULLPTR), p)) {
     // Put the output in the right place.
     if (p == cmsysProcess_Pipe_STDOUT && !output_quiet) {
       if (output_variable.empty()) {
-        cmSystemTools::Stdout(data, length);
+        processOutput.DecodeText(data, length, strdata, 1);
+        cmSystemTools::Stdout(strdata.c_str(), strdata.size());
       } else {
         cmExecuteProcessCommandAppend(tempOutput, data, length);
       }
     } else if (p == cmsysProcess_Pipe_STDERR && !error_quiet) {
       if (error_variable.empty()) {
-        cmSystemTools::Stderr(data, length);
+        processOutput.DecodeText(data, length, strdata, 2);
+        cmSystemTools::Stderr(strdata.c_str(), strdata.size());
       } else {
         cmExecuteProcessCommandAppend(tempError, data, length);
       }
@@ -247,6 +252,8 @@ bool cmExecuteProcessCommand::InitialPass(std::vector<std::string> const& args,
 
   // All output has been read.  Wait for the process to exit.
   cmsysProcess_WaitForExit(cp, CM_NULLPTR);
+  processOutput.DecodeText(tempOutput, tempOutput);
+  processOutput.DecodeText(tempError, tempError);
 
   // Fix the text in the output strings.
   cmExecuteProcessCommandFixText(tempOutput, output_strip_trailing_whitespace);
