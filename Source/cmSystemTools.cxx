@@ -21,6 +21,7 @@
 #ifdef __QNX__
 #include <malloc.h> /* for malloc/free on QNX */
 #endif
+#include "cmProcessOutput.hxx"
 #include <cmsys/Directory.hxx>
 #include <cmsys/Encoding.hxx>
 #include <cmsys/Glob.hxx>
@@ -612,6 +613,8 @@ bool cmSystemTools::RunSingleCommand(std::vector<std::string> const& command,
   char* data;
   int length;
   int pipe;
+  cmProcessOutput processOutput;
+  std::string strdata;
   if (outputflag != OUTPUT_PASSTHROUGH &&
       (captureStdOut || captureStdErr || outputflag != OUTPUT_NONE)) {
     while ((pipe = cmsysProcess_WaitForData(cp, &data, &length, CM_NULLPTR)) >
@@ -627,14 +630,16 @@ bool cmSystemTools::RunSingleCommand(std::vector<std::string> const& command,
 
       if (pipe == cmsysProcess_Pipe_STDOUT) {
         if (outputflag != OUTPUT_NONE) {
-          cmSystemTools::Stdout(data, length);
+          processOutput.DecodeText(data, length, strdata, 1);
+          cmSystemTools::Stdout(strdata.c_str(), strdata.size());
         }
         if (captureStdOut) {
           tempStdOut.insert(tempStdOut.end(), data, data + length);
         }
       } else if (pipe == cmsysProcess_Pipe_STDERR) {
         if (outputflag != OUTPUT_NONE) {
-          cmSystemTools::Stderr(data, length);
+          processOutput.DecodeText(data, length, strdata, 2);
+          cmSystemTools::Stderr(strdata.c_str(), strdata.size());
         }
         if (captureStdErr) {
           tempStdErr.insert(tempStdErr.end(), data, data + length);
@@ -646,9 +651,11 @@ bool cmSystemTools::RunSingleCommand(std::vector<std::string> const& command,
   cmsysProcess_WaitForExit(cp, CM_NULLPTR);
   if (captureStdOut) {
     captureStdOut->assign(tempStdOut.begin(), tempStdOut.end());
+    processOutput.DecodeText(*captureStdOut, *captureStdOut);
   }
   if (captureStdErr) {
     captureStdErr->assign(tempStdErr.begin(), tempStdErr.end());
+    processOutput.DecodeText(*captureStdErr, *captureStdErr);
   }
 
   bool result = true;

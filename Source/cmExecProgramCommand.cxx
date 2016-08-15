@@ -11,6 +11,7 @@
 ============================================================================*/
 #include "cmExecProgramCommand.h"
 
+#include "cmProcessOutput.hxx"
 #include "cmSystemTools.h"
 
 #include <cmsys/Process.h>
@@ -219,6 +220,7 @@ bool cmExecProgramCommand::RunCommand(const char* command, std::string& output,
   int length;
   char* data;
   int p;
+  cmProcessOutput processOutput;
   while ((p = cmsysProcess_WaitForData(cp, &data, &length, CM_NULLPTR), p)) {
     if (p == cmsysProcess_Pipe_STDOUT || p == cmsysProcess_Pipe_STDERR) {
       if (verbose) {
@@ -230,6 +232,7 @@ bool cmExecProgramCommand::RunCommand(const char* command, std::string& output,
 
   // All output has been read.  Wait for the process to exit.
   cmsysProcess_WaitForExit(cp, CM_NULLPTR);
+  processOutput.DecodeText(output, output);
 
   // Check the result of running the process.
   std::string msg;
