@@ -192,7 +192,8 @@ void cmSystemTools::ExpandRegistryValues(std::string& source, KeyWOW64 view)
   }
 }
 #else
-void cmSystemTools::ExpandRegistryValues(std::string& source, KeyWOW64)
+void cmSystemTools::ExpandRegistryValues(std::string& source,
+                                         KeyWOW64 /*unused*/)
 {
   cmsys::RegularExpression regEntry("\\[(HKEY[^]]*)\\]");
   while (regEntry.find(source)) {
