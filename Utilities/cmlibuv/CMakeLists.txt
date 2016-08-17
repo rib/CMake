@@ -1,5 +1,13 @@
 project(libuv C)
 
+# Disable warnings to avoid changing 3rd party code.
+if(CMAKE_CXX_COMPILER_ID MATCHES
+    "^(GNU|Clang|AppleClang|XL|VisualAge|SunPro|MIPSpro|HP|Intel)$")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
+elseif(CMAKE_CXX_COMPILER_ID STREQUAL "PathScale")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -woffall")
+endif()
+
 find_package(Threads)
 
 set(uv_libraries ${CMAKE_THREAD_LIBS_INIT})
