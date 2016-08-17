@@ -13,13 +13,22 @@
 
 #include "cmAlgorithms.h"
 #include "cmComputeComponentGraph.h"
+#include "cmGeneratorTarget.h"
 #include "cmGlobalGenerator.h"
 #include "cmLocalGenerator.h"
 #include "cmMakefile.h"
+#include "cmState.h"
+#include "cmSystemTools.h"
 #include "cmTarget.h"
 #include "cmake.h"
 
 #include <assert.h>
+#include <stdio.h>
+#include <string.h>
+#include <algorithm>
+#include <iterator>
+#include <sstream>
+#include <utility>
 
 /*
 
