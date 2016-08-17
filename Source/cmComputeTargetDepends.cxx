@@ -26,8 +26,8 @@
 #include "cmake.h"
 
 #include <assert.h>
-#include <stdio.h>
 #include <sstream>
+#include <stdio.h>
 #include <utility>
 
 class cmListFileBacktrace;

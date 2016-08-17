@@ -18,9 +18,9 @@
 #include <cmsys/Directory.hxx>
 #include <cmsys/Encoding.hxx>
 #include <cmsys/FStream.hxx>
+#include <iostream>
 #include <string.h>
 #include <time.h>
-#include <iostream>
 
 #ifndef __LA_SSIZE_T
 #define __LA_SSIZE_T la_ssize_t
