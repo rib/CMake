@@ -31,10 +31,10 @@ public:
                   size_t id = 0);
 
 private:
+#if defined(_WIN32)
   unsigned int codepage;
   unsigned int bufferSize;
   std::vector<std::string> rawparts;
-#if defined(_WIN32)
   bool DoDecodeText(std::string raw, std::string& decoded, wchar_t* lastChar);
 #endif
 };
