@@ -11,8 +11,8 @@
 ============================================================================*/
 #include "cmCommonTargetGenerator.h"
 
-#include <cmConfigure.h>
 #include <algorithm>
+#include <cmConfigure.h>
 #include <set>
 #include <sstream>
 #include <utility>

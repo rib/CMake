@@ -22,12 +22,12 @@
 #include "cmTarget.h"
 #include "cmake.h"
 
-#include <assert.h>
-#include <stdio.h>
-#include <string.h>
 #include <algorithm>
+#include <assert.h>
 #include <iterator>
 #include <sstream>
+#include <stdio.h>
+#include <string.h>
 #include <utility>
 
 /*

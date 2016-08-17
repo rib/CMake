@@ -14,8 +14,8 @@
 
 #include <cmConfigure.h> // IWYU pragma: keep
 
-#include <stddef.h>
 #include <iosfwd>
+#include <stddef.h>
 #include <string>
 
 #if !defined(CMAKE_BUILD_WITH_CMAKE)

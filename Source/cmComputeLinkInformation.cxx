@@ -25,10 +25,10 @@
 #include "cmTarget.h"
 #include "cmake.h"
 
-#include <ctype.h>
-#include <string.h>
 #include <algorithm>
+#include <ctype.h>
 #include <sstream>
+#include <string.h>
 #include <utility>
 
 //#define CM_COMPUTE_LINK_INFO_DEBUG
