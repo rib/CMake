@@ -11,19 +11,25 @@
 ============================================================================*/
 #include "cmComputeLinkInformation.h"
 
-#include "cmComputeLinkDepends.h"
-#include "cmOrderDirectories.h"
-
 #include "cmAlgorithms.h"
+#include "cmComputeLinkDepends.h"
 #include "cmGeneratorTarget.h"
 #include "cmGlobalGenerator.h"
 #include "cmLocalGenerator.h"
 #include "cmMakefile.h"
+#include "cmOrderDirectories.h"
 #include "cmOutputConverter.h"
+#include "cmPolicies.h"
 #include "cmState.h"
+#include "cmSystemTools.h"
+#include "cmTarget.h"
 #include "cmake.h"
 
 #include <ctype.h>
+#include <string.h>
+#include <algorithm>
+#include <sstream>
+#include <utility>
 
 //#define CM_COMPUTE_LINK_INFO_DEBUG
 
