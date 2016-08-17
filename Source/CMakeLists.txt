@@ -317,8 +317,6 @@ set(SRCS
   cmOrderDirectories.h
   cmPolicies.h
   cmPolicies.cxx
-  cmProcessOutput.cxx
-  cmProcessOutput.hxx
   cmProcessTools.cxx
   cmProcessTools.h
   cmProperty.cxx
@@ -376,9 +374,6 @@ set(SRCS
   cm_utf8.h
   cm_utf8.c
   )
-
-SET_PROPERTY(SOURCE cmProcessOutput.cxx APPEND PROPERTY COMPILE_DEFINITIONS
-  KWSYS_ENCODING_DEFAULT_CODEPAGE=${KWSYS_ENCODING_DEFAULT_CODEPAGE})
 
 set(COMMAND_INCLUDES "#include \"cmTargetPropCommandBase.cxx\"\n")
 list(APPEND SRCS cmTargetPropCommandBase.cxx)

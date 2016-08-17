@@ -10,7 +10,6 @@
   See the License for more information.
 ============================================================================*/
 #include "cmProcessTools.h"
-#include "cmProcessOutput.hxx"
 
 #include <cmsys/Process.h>
 
@@ -21,18 +20,14 @@ void cmProcessTools::RunProcess(struct cmsysProcess_s* cp, OutputParser* out,
   char* data = CM_NULLPTR;
   int length = 0;
   int p;
-  cmProcessOutput processOutput;
-  std::string strdata;
   while ((out || err) &&
          (p = cmsysProcess_WaitForData(cp, &data, &length, CM_NULLPTR), p)) {
     if (out && p == cmsysProcess_Pipe_STDOUT) {
-      processOutput.DecodeText(data, length, strdata, 1);
-      if (!out->Process(strdata.c_str(), int(strdata.size()))) {
+      if (!out->Process(data, length)) {
         out = CM_NULLPTR;
       }
     } else if (err && p == cmsysProcess_Pipe_STDERR) {
-      processOutput.DecodeText(data, length, strdata, 2);
-      if (!err->Process(strdata.c_str(), int(strdata.size()))) {
+      if (!err->Process(data, length)) {
         err = CM_NULLPTR;
       }
     }
