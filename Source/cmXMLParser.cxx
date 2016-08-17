@@ -11,10 +11,12 @@
 ============================================================================*/
 #include "cmXMLParser.h"
 
-#include <cmsys/FStream.hxx>
-
 #include <cm_expat.h>
+#include <cmsys/FStream.hxx>
 #include <ctype.h>
+#include <iostream>
+#include <sstream>
+#include <string.h>
 
 cmXMLParser::cmXMLParser()
 {
@@ -198,7 +200,7 @@ void cmXMLParser::ReportXmlParseError()
                     XML_ErrorString(XML_GetErrorCode(parser)));
 }
 
-void cmXMLParser::ReportError(int line, int, const char* msg)
+void cmXMLParser::ReportError(int line, int /*unused*/, const char* msg)
 {
   if (this->ReportCallback) {
     this->ReportCallback(line, msg, this->ReportCallbackData);

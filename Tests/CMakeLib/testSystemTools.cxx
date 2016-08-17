@@ -11,12 +11,15 @@
 ============================================================================*/
 #include "cmSystemTools.h"
 
+#include <iostream>
+#include <string>
+
 #define cmPassed(m) std::cout << "Passed: " << m << "\n"
 #define cmFailed(m)                                                           \
   std::cout << "FAILED: " << m << "\n";                                       \
   failed = 1
 
-int testSystemTools(int, char* [])
+int testSystemTools(int /*unused*/, char* /*unused*/ [])
 {
   int failed = 0;
   // ----------------------------------------------------------------------

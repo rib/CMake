@@ -77,7 +77,8 @@ cmExtraEclipseCDT4Generator::GetFactory()
 }
 
 void cmExtraEclipseCDT4Generator::EnableLanguage(
-  std::vector<std::string> const& languages, cmMakefile*, bool)
+  std::vector<std::string> const& languages, cmMakefile* /*unused*/,
+  bool /*optional*/)
 {
   for (std::vector<std::string>::const_iterator lit = languages.begin();
        lit != languages.end(); ++lit) {
@@ -404,8 +405,8 @@ void cmExtraEclipseCDT4Generator::CreateProjectFile()
   if (this->IsOutOfSourceBuild) {
     // create a linked resource to CMAKE_SOURCE_DIR
     // (this is not done anymore for each project because of
-    // http://public.kitware.com/Bug/view.php?id=9978 and because I found it
-    // actually quite confusing in bigger projects with many directories and
+    // https://gitlab.kitware.com/cmake/cmake/issues/9978 and because I found
+    // it actually quite confusing in bigger projects with many directories and
     // projects, Alex
 
     std::string sourceLinkedResourceName = "[Source directory]";

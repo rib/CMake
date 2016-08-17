@@ -206,8 +206,7 @@ void cmExtraSublimeTextGenerator::AppendAllTargets(
 void cmExtraSublimeTextGenerator::AppendTarget(
   cmGeneratedFileStream& fout, const std::string& targetName,
   cmLocalGenerator* lg, cmGeneratorTarget* target, const char* make,
-  const cmMakefile* makefile,
-  const char*, // compiler
+  const cmMakefile* makefile, const char* /*compiler*/,
   MapSourceFileFlags& sourceFileFlags, bool firstTarget)
 {
 
@@ -302,7 +301,7 @@ std::string cmExtraSublimeTextGenerator::BuildMakeCommand(
     std::string makefileName;
     if (generator == "MinGW Makefiles") {
       // no escaping of spaces in this case, see
-      // http://public.kitware.com/Bug/view.php?id=10014
+      // https://gitlab.kitware.com/cmake/cmake/issues/10014
       makefileName = makefile;
     } else {
       makefileName = cmSystemTools::ConvertToOutputPath(makefile);
