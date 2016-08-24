@@ -12,26 +12,22 @@
 #include "cmCTestSubmitHandler.h"
 
 #include "cmCTest.h"
+#include "cmCTestCurl.h"
 #include "cmCTestScriptHandler.h"
+#include "cmCurl.h"
 #include "cmGeneratedFileStream.h"
 #include "cmState.h"
 #include "cmSystemTools.h"
-#include "cmVersion.h"
 #include "cmXMLParser.h"
 #include "cmake.h"
 
-#include <cmsys/Base64.h>
-#include <cmsys/Process.h>
-
-// For XML-RPC submission
-#include "cm_xmlrpc.h"
-
+#include <cm_curl.h>
 #include <cm_jsoncpp_reader.h>
-// For curl submission
-#include "cmCTestCurl.h"
-#include "cmCurl.h"
-
-#include <sys/stat.h>
+#include <cm_jsoncpp_value.h>
+#include <cmsys/Process.h>
+#include <sstream>
+#include <stdio.h>
+#include <stdlib.h>
 
 #define SUBMIT_TIMEOUT_IN_SECONDS_DEFAULT 120
 
