@@ -3,3 +3,5 @@ CMake Error at UnterminatedBracket0.cmake:2:
   bracket with text "\)
 
   ".
+Call Stack \(most recent call first\):
+  CMakeLists.txt:3 \(include\)
