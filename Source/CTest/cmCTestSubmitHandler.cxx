@@ -29,6 +29,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#if defined(CTEST_USE_XMLRPC)
+#include "cmVersion.h"
+#include <cm_xmlrpc.h>
+#include <sys/stat.h>
+#endif
+
 #define SUBMIT_TIMEOUT_IN_SECONDS_DEFAULT 120
 
 typedef std::vector<char> cmCTestSubmitHandlerVectorOfChar;
