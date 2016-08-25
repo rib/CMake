@@ -2742,7 +2742,7 @@ void cmVisualStudio10TargetGenerator::WriteWinRTPackageCertificateKeyFile()
       (*this->BuildFileStream) << cmVS10EscapeXML(artifactDir)
                                << "\\</AppxPackageArtifactsDir>\n";
       this->WriteString("<ProjectPriFullPath>"
-                        "$(IntDir)resources.pri</ProjectPriFullPath>\n",
+                        "$(TargetDir)resources.pri</ProjectPriFullPath>\n",
                         2);
 
       // If we are missing files and we don't have a certificate and
