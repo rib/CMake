@@ -46,38 +46,40 @@ std::string cmOutputConverter::ConvertToOutputForExisting(
   return this->ConvertToOutputFormat(remote, format);
 }
 
+std::string cmOutputConverter::ConvertToRelativePath(
+  const std::string& source, RelativeRoot relative) const
+{
+  std::string result;
+
+  switch (relative) {
+    case HOME:
+      result = this->ConvertToRelativePath(
+        this->GetState()->GetSourceDirectoryComponents(), source);
+      break;
+    case START:
+      result = this->ConvertToRelativePath(
+        this->StateSnapshot.GetDirectory().GetCurrentSourceComponents(),
+        source);
+      break;
+    case HOME_OUTPUT:
+      result = this->ConvertToRelativePath(
+        this->GetState()->GetBinaryDirectoryComponents(), source);
+      break;
+    case START_OUTPUT:
+      result = this->ConvertToRelativePath(
+        this->StateSnapshot.GetDirectory().GetCurrentBinaryComponents(),
+        source);
+      break;
+  }
+  return result;
+}
+
 std::string cmOutputConverter::Convert(const std::string& source,
                                        RelativeRoot relative,
                                        OutputFormat output) const
 {
   // Convert the path to a relative path.
-  std::string result = source;
-
-  switch (relative) {
-    case HOME:
-      result = this->ConvertToRelativePath(
-        this->GetState()->GetSourceDirectoryComponents(), result);
-      break;
-    case START:
-      result = this->ConvertToRelativePath(
-        this->StateSnapshot.GetDirectory().GetCurrentSourceComponents(),
-        result);
-      break;
-    case HOME_OUTPUT:
-      result = this->ConvertToRelativePath(
-        this->GetState()->GetBinaryDirectoryComponents(), result);
-      break;
-    case START_OUTPUT:
-      result = this->ConvertToRelativePath(
-        this->StateSnapshot.GetDirectory().GetCurrentBinaryComponents(),
-        result);
-      break;
-    case FULL:
-      result = cmSystemTools::CollapseFullPath(result);
-      break;
-    case NONE:
-      break;
-  }
+  std::string result = this->ConvertToRelativePath(source, relative);
   return this->ConvertToOutputFormat(result, output);
 }
 
