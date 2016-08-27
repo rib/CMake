@@ -982,7 +982,7 @@ void cmLocalUnixMakefileGenerator3::AppendCustomCommand(
                                         : cmOutputConverter::NONE);
       std::string shellCommand = this->MaybeConvertWacomShellCommand(cmd);
       if (shellCommand.empty()) {
-        shellCommand = this->Convert(cmd, cmOutputConverter::NONE);
+        shellCommand = this->Convert(cmd, cmOutputConverter::NONE, cmOutputConverter::SHELL);
       }
       cmd = launcher + shellCommand;
 
