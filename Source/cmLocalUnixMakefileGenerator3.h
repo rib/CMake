@@ -251,6 +251,9 @@ protected:
 
 private:
   std::string MaybeConvertWacomShellCommand(std::string const& cmd);
+  std::string MakeLauncher(cmCustomCommandGenerator const& ccg,
+                           cmGeneratorTarget* target,
+                           cmOutputConverter::RelativeRoot relative);
 
   void ComputeObjectFilenames(
     std::map<cmSourceFile const*, std::string>& mapping,

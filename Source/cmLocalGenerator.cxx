@@ -176,7 +176,7 @@ void cmLocalGenerator::GenerateTestFiles()
     // TODO: Use add_subdirectory instead?
     fout << "subdirs(";
     std::string outP = children[i].GetDirectory().GetCurrentBinary();
-    fout << this->ConvertToRelativePath(outP, START_OUTPUT);
+    fout << this->Convert(outP, START_OUTPUT);
     fout << ")" << std::endl;
   }
 }
@@ -688,9 +688,7 @@ std::string cmLocalGenerator::ExpandRuleVariable(
     }
   }
   if (variable == "CMAKE_COMMAND") {
-    return this->ConvertToOutputFormat(
-      cmSystemTools::CollapseFullPath(cmSystemTools::GetCMakeCommand()),
-      SHELL);
+    return this->Convert(cmSystemTools::GetCMakeCommand(), FULL, SHELL);
   }
   std::vector<std::string> enabledLanguages =
     this->GetState()->GetEnabledLanguages();
@@ -1185,8 +1183,7 @@ void cmLocalGenerator::GetTargetFlags(
           if (sf->GetExtension() == "def") {
             linkFlags +=
               this->Makefile->GetSafeDefinition("CMAKE_LINK_DEF_FILE_FLAG");
-            linkFlags += this->ConvertToOutputFormat(
-              cmSystemTools::CollapseFullPath(sf->GetFullPath()), SHELL);
+            linkFlags += this->Convert(sf->GetFullPath(), FULL, SHELL);
             linkFlags += " ";
           }
         }
@@ -1396,7 +1393,7 @@ std::string cmLocalGenerator::ConvertToLinkReference(std::string const& lib,
         sp += lib.substr(pos);
 
         // Convert to an output path.
-        return this->ConvertToOutputFormat(sp.c_str(), format);
+        return this->Convert(sp.c_str(), NONE, format);
       }
     }
   }
@@ -1492,7 +1489,7 @@ void cmLocalGenerator::OutputLinkLibraries(std::string& linkLibraries,
     for (std::vector<std::string>::const_iterator fdi = fwDirs.begin();
          fdi != fwDirs.end(); ++fdi) {
       frameworkPath += fwSearchFlag;
-      frameworkPath += this->ConvertToOutputFormat(*fdi, shellFormat);
+      frameworkPath += this->Convert(*fdi, NONE, shellFormat);
       frameworkPath += " ";
     }
   }
@@ -1538,7 +1535,7 @@ void cmLocalGenerator::OutputLinkLibraries(std::string& linkLibraries,
     for (std::vector<std::string>::iterator ri = runtimeDirs.begin();
          ri != runtimeDirs.end(); ++ri) {
       rpath += cli.GetRuntimeFlag();
-      rpath += this->ConvertToOutputFormat(*ri, shellFormat);
+      rpath += this->Convert(*ri, NONE, shellFormat);
       rpath += " ";
     }
     fout << rpath;
@@ -1608,7 +1605,7 @@ void cmLocalGenerator::AddArchitectureFlags(std::string& flags,
       flags += " ";
       flags += sysrootFlag;
       flags += " ";
-      flags += this->ConvertToOutputFormat(sysroot, SHELL);
+      flags += this->Convert(sysroot, NONE, SHELL);
     }
 
     if (deploymentTargetFlag && *deploymentTargetFlag && deploymentTarget &&
@@ -2240,8 +2237,7 @@ std::string cmLocalGenerator::ConstructComment(
     for (std::vector<std::string>::const_iterator o = ccg.GetOutputs().begin();
          o != ccg.GetOutputs().end(); ++o) {
       comment += sep;
-      comment +=
-        this->ConvertToRelativePath(*o, cmOutputConverter::START_OUTPUT);
+      comment += this->Convert(*o, cmOutputConverter::START_OUTPUT);
       sep = ", ";
     }
     return comment;
@@ -2509,14 +2505,13 @@ std::string cmLocalGenerator::GetObjectFileNameWithoutTarget(
   const char* fullPath = source.GetFullPath().c_str();
 
   // Try referencing the source relative to the source tree.
-  std::string relFromSource = this->ConvertToRelativePath(fullPath, START);
+  std::string relFromSource = this->Convert(fullPath, START);
   assert(!relFromSource.empty());
   bool relSource = !cmSystemTools::FileIsFullPath(relFromSource.c_str());
   bool subSource = relSource && relFromSource[0] != '.';
 
   // Try referencing the source relative to the binary tree.
-  std::string relFromBinary =
-    this->ConvertToRelativePath(fullPath, START_OUTPUT);
+  std::string relFromBinary = this->Convert(fullPath, START_OUTPUT);
   assert(!relFromBinary.empty());
   bool relBinary = !cmSystemTools::FileIsFullPath(relFromBinary.c_str());
   bool subBinary = relBinary && relFromBinary[0] != '.';

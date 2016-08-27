@@ -127,6 +127,7 @@ std::string cmLocalVisualStudioGenerator::ConstructScript(
 {
   bool useLocal = this->CustomCommandUseLocal();
   std::string workingDirectory = ccg.GetWorkingDirectory();
+  RelativeRoot relativeRoot = workingDirectory.empty() ? START_OUTPUT : NONE;
 
   // Avoid leading or trailing newlines.
   std::string newline = "";
@@ -155,8 +156,7 @@ std::string cmLocalVisualStudioGenerator::ConstructScript(
     script += newline;
     newline = newline_text;
     script += "cd ";
-    script += this->ConvertToOutputFormat(
-      cmSystemTools::CollapseFullPath(workingDirectory), SHELL);
+    script += this->Convert(workingDirectory, FULL, SHELL);
     script += check_error;
 
     // Change the working drive.
@@ -203,11 +203,7 @@ std::string cmLocalVisualStudioGenerator::ConstructScript(
       }
     }
 
-    if (workingDirectory.empty()) {
-      script += this->Convert(cmd.c_str(), START_OUTPUT, SHELL);
-    } else {
-      script += this->ConvertToOutputFormat(cmd.c_str(), SHELL);
-    }
+    script += this->Convert(cmd.c_str(), relativeRoot, SHELL);
     ccg.AppendArguments(c, script);
 
     // After each custom command, check for an error result.
