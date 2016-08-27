@@ -835,7 +835,8 @@ std::string cmLocalUnixMakefileGenerator3::GetRelativeTargetDirectory(
 {
   std::string dir = this->HomeRelativeOutputPath;
   dir += this->GetTargetDirectory(target);
-  return dir;
+  return this->Convert(dir, cmOutputConverter::NONE,
+                       cmOutputConverter::UNCHANGED);
 }
 
 void cmLocalUnixMakefileGenerator3::AppendFlags(std::string& flags,
@@ -981,7 +982,7 @@ void cmLocalUnixMakefileGenerator3::AppendCustomCommand(
                                         : cmOutputConverter::NONE);
       std::string shellCommand = this->MaybeConvertWacomShellCommand(cmd);
       if (shellCommand.empty()) {
-        shellCommand = cmd;
+        shellCommand = this->Convert(cmd, cmOutputConverter::NONE);
       }
       cmd = launcher + shellCommand;
 
