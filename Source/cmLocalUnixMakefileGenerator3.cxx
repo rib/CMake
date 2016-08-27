@@ -140,7 +140,7 @@ void cmLocalUnixMakefileGenerator3::ComputeHomeRelativeOutputPath()
 {
   // Compute the path to use when referencing the current output
   // directory from the top output directory.
-  this->HomeRelativeOutputPath = this->ConvertToRelativePath(
+  this->HomeRelativeOutputPath = this->Convert(
     this->GetCurrentBinaryDirectory(), cmOutputConverter::HOME_OUTPUT);
   if (this->HomeRelativeOutputPath == ".") {
     this->HomeRelativeOutputPath = "";
@@ -602,7 +602,8 @@ std::string cmLocalUnixMakefileGenerator3::MaybeConvertWacomShellCommand(
     // lines with shell redirection operators.
     std::string scmd;
     if (cmSystemTools::GetShortPath(cmd, scmd)) {
-      return this->ConvertToOutputFormat(scmd, cmOutputConverter::SHELL);
+      return this->Convert(scmd, cmOutputConverter::NONE,
+                           cmOutputConverter::SHELL);
     }
   }
   return std::string();
@@ -640,9 +641,9 @@ void cmLocalUnixMakefileGenerator3::WriteMakeVariables(
   std::string cmakeShellCommand =
     this->MaybeConvertWacomShellCommand(cmSystemTools::GetCMakeCommand());
   if (cmakeShellCommand.empty()) {
-    cmakeShellCommand = this->ConvertToOutputFormat(
-      cmSystemTools::CollapseFullPath(cmSystemTools::GetCMakeCommand()),
-      cmOutputConverter::SHELL);
+    cmakeShellCommand =
+      this->Convert(cmSystemTools::GetCMakeCommand(), cmOutputConverter::FULL,
+                    cmOutputConverter::SHELL);
   }
 
   /* clang-format off */
@@ -665,14 +666,16 @@ void cmLocalUnixMakefileGenerator3::WriteMakeVariables(
   makefileStream
     << "# The top-level source directory on which CMake was run.\n"
     << "CMAKE_SOURCE_DIR = "
-    << this->ConvertToOutputFormat(cmSystemTools::CollapseFullPath(this->GetSourceDirectory()),
+    << this->Convert(this->GetSourceDirectory(),
+                     cmOutputConverter::FULL,
                      cmOutputConverter::SHELL)
     << "\n"
     << "\n";
   makefileStream
     << "# The top-level build directory on which CMake was run.\n"
     << "CMAKE_BINARY_DIR = "
-    << this->ConvertToOutputFormat(cmSystemTools::CollapseFullPath(this->GetBinaryDirectory()),
+    << this->Convert(this->GetBinaryDirectory(),
+                     cmOutputConverter::FULL,
                      cmOutputConverter::SHELL)
     << "\n"
     << "\n";
@@ -787,8 +790,8 @@ void cmLocalUnixMakefileGenerator3::WriteSpecialTargetsBottom(
     std::string runRule =
       "$(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)";
     runRule += " --check-build-system ";
-    runRule +=
-      this->ConvertToOutputFormat(cmakefileName, cmOutputConverter::SHELL);
+    runRule += this->Convert(cmakefileName, cmOutputConverter::NONE,
+                             cmOutputConverter::SHELL);
     runRule += " 0";
 
     std::vector<std::string> no_depends;
@@ -964,8 +967,7 @@ void cmLocalUnixMakefileGenerator3::AppendCustomCommand(
       // working directory will be the start-output directory.
       bool had_slash = cmd.find('/') != cmd.npos;
       if (workingDir.empty()) {
-        cmd =
-          this->ConvertToRelativePath(cmd, cmOutputConverter::START_OUTPUT);
+        cmd = this->Convert(cmd, cmOutputConverter::START_OUTPUT);
       }
       bool has_slash = cmd.find('/') != cmd.npos;
       if (had_slash && !has_slash) {
@@ -974,37 +976,9 @@ void cmLocalUnixMakefileGenerator3::AppendCustomCommand(
         // without the current directory being in the search path.
         cmd = "./" + cmd;
       }
-
-      std::string launcher;
-      // Short-circuit if there is no launcher.
-      const char* prop = "RULE_LAUNCH_CUSTOM";
-      const char* val = this->GetRuleLauncher(target, prop);
-      if (val && *val) {
-        // Expand rules in the empty string.  It may insert the launcher and
-        // perform replacements.
-        RuleVariables vars;
-        vars.RuleLauncher = prop;
-        vars.CMTarget = target;
-        std::string output;
-        const std::vector<std::string>& outputs = ccg.GetOutputs();
-        if (!outputs.empty()) {
-          if (workingDir.empty()) {
-            output = this->Convert(outputs[0], cmOutputConverter::START_OUTPUT,
-                                   cmOutputConverter::SHELL);
-
-          } else {
-            output = this->ConvertToOutputFormat(outputs[0],
-                                                 cmOutputConverter::SHELL);
-          }
-        }
-        vars.Output = output.c_str();
-
-        this->ExpandRuleVariables(launcher, vars);
-        if (!launcher.empty()) {
-          launcher += " ";
-        }
-      }
-
+      std::string launcher = this->MakeLauncher(
+        ccg, target, workingDir.empty() ? cmOutputConverter::START_OUTPUT
+                                        : cmOutputConverter::NONE);
       std::string shellCommand = this->MaybeConvertWacomShellCommand(cmd);
       if (shellCommand.empty()) {
         shellCommand = cmd;
@@ -1052,6 +1026,37 @@ void cmLocalUnixMakefileGenerator3::AppendCustomCommand(
   commands.insert(commands.end(), commands1.begin(), commands1.end());
 }
 
+std::string cmLocalUnixMakefileGenerator3::MakeLauncher(
+  cmCustomCommandGenerator const& ccg, cmGeneratorTarget* target,
+  cmOutputConverter::RelativeRoot relative)
+{
+  // Short-circuit if there is no launcher.
+  const char* prop = "RULE_LAUNCH_CUSTOM";
+  const char* val = this->GetRuleLauncher(target, prop);
+  if (!(val && *val)) {
+    return "";
+  }
+
+  // Expand rules in the empty string.  It may insert the launcher and
+  // perform replacements.
+  RuleVariables vars;
+  vars.RuleLauncher = prop;
+  vars.CMTarget = target;
+  std::string output;
+  const std::vector<std::string>& outputs = ccg.GetOutputs();
+  if (!outputs.empty()) {
+    output = this->Convert(outputs[0], relative, cmOutputConverter::SHELL);
+  }
+  vars.Output = output.c_str();
+
+  std::string launcher;
+  this->ExpandRuleVariables(launcher, vars);
+  if (!launcher.empty()) {
+    launcher += " ";
+  }
+  return launcher;
+}
+
 void cmLocalUnixMakefileGenerator3::AppendCleanCommand(
   std::vector<std::string>& commands, const std::vector<std::string>& files,
   cmGeneratorTarget* target, const char* filename)
@@ -1065,7 +1070,8 @@ void cmLocalUnixMakefileGenerator3::AppendCleanCommand(
     cleanfile += filename;
   }
   cleanfile += ".cmake";
-  std::string cleanfilePath = cmSystemTools::CollapseFullPath(cleanfile);
+  std::string cleanfilePath =
+    this->Convert(cleanfile, cmOutputConverter::FULL);
   cmsys::ofstream fout(cleanfilePath.c_str());
   if (!fout) {
     cmSystemTools::Error("Could not create ", cleanfilePath.c_str());
@@ -1074,8 +1080,8 @@ void cmLocalUnixMakefileGenerator3::AppendCleanCommand(
     fout << "file(REMOVE_RECURSE\n";
     for (std::vector<std::string>::const_iterator f = files.begin();
          f != files.end(); ++f) {
-      std::string fc =
-        this->ConvertToRelativePath(*f, cmOutputConverter::START_OUTPUT);
+      std::string fc = this->Convert(*f, cmOutputConverter::START_OUTPUT,
+                                     cmOutputConverter::UNCHANGED);
       fout << "  " << cmOutputConverter::EscapeForCMake(fc) << "\n";
     }
     fout << ")\n";
@@ -1151,9 +1157,8 @@ void cmLocalUnixMakefileGenerator3::AppendEcho(
           cmd += color_name;
           if (progress) {
             cmd += "--progress-dir=";
-            cmd += this->ConvertToOutputFormat(
-              cmSystemTools::CollapseFullPath(progress->Dir),
-              cmOutputConverter::SHELL);
+            cmd += this->Convert(progress->Dir, cmOutputConverter::FULL,
+                                 cmOutputConverter::SHELL);
             cmd += " ";
             cmd += "--progress-num=";
             cmd += progress->Arg;
@@ -1601,16 +1606,15 @@ void cmLocalUnixMakefileGenerator3::WriteLocalAllRules(
   {
     std::ostringstream progCmd;
     progCmd << "$(CMAKE_COMMAND) -E cmake_progress_start ";
-    progCmd << this->ConvertToOutputFormat(
-      cmSystemTools::CollapseFullPath(progressDir), cmOutputConverter::SHELL);
+    progCmd << this->Convert(progressDir, cmOutputConverter::FULL,
+                             cmOutputConverter::SHELL);
 
     std::string progressFile = cmake::GetCMakeFilesDirectory();
     progressFile += "/progress.marks";
     std::string progressFileNameFull = this->ConvertToFullPath(progressFile);
     progCmd << " "
-            << this->ConvertToOutputFormat(
-                 cmSystemTools::CollapseFullPath(progressFileNameFull),
-                 cmOutputConverter::SHELL);
+            << this->Convert(progressFileNameFull, cmOutputConverter::FULL,
+                             cmOutputConverter::SHELL);
     commands.push_back(progCmd.str());
   }
   std::string mf2Dir = cmake::GetCMakeFilesDirectoryPostSlash();
@@ -1622,8 +1626,8 @@ void cmLocalUnixMakefileGenerator3::WriteLocalAllRules(
   {
     std::ostringstream progCmd;
     progCmd << "$(CMAKE_COMMAND) -E cmake_progress_start "; // # 0
-    progCmd << this->ConvertToOutputFormat(
-      cmSystemTools::CollapseFullPath(progressDir), cmOutputConverter::SHELL);
+    progCmd << this->Convert(progressDir, cmOutputConverter::FULL,
+                             cmOutputConverter::SHELL);
     progCmd << " 0";
     commands.push_back(progCmd.str());
   }
@@ -1679,8 +1683,8 @@ void cmLocalUnixMakefileGenerator3::WriteLocalAllRules(
   std::string runRule =
     "$(CMAKE_COMMAND) -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)";
   runRule += " --check-build-system ";
-  runRule +=
-    this->ConvertToOutputFormat(cmakefileName, cmOutputConverter::SHELL);
+  runRule += this->Convert(cmakefileName, cmOutputConverter::NONE,
+                           cmOutputConverter::SHELL);
   runRule += " 1";
   commands.push_back(runRule);
   this->CreateCDCommand(commands, this->GetBinaryDirectory(),
@@ -1851,8 +1855,7 @@ void cmLocalUnixMakefileGenerator3::WriteDependLanguageInfo(
     for (std::vector<std::string>::iterator i = includes.begin();
          i != includes.end(); ++i) {
       cmakefileStream << "  \""
-                      << this->ConvertToRelativePath(
-                           *i, cmOutputConverter::HOME_OUTPUT)
+                      << this->Convert(*i, cmOutputConverter::HOME_OUTPUT)
                       << "\"\n";
     }
     cmakefileStream << "  )\n";
@@ -1894,7 +1897,8 @@ std::string cmLocalUnixMakefileGenerator3::GetRecursiveMakeCall(
   // Call make on the given file.
   std::string cmd;
   cmd += "$(MAKE) -f ";
-  cmd += this->ConvertToOutputFormat(makefile, cmOutputConverter::SHELL);
+  cmd +=
+    this->Convert(makefile, cmOutputConverter::NONE, cmOutputConverter::SHELL);
   cmd += " ";
 
   cmGlobalUnixMakefileGenerator3* gg =
@@ -1916,8 +1920,7 @@ std::string cmLocalUnixMakefileGenerator3::GetRecursiveMakeCall(
   // Add the target.
   if (!tgt.empty()) {
     // The make target is always relative to the top of the build tree.
-    std::string tgt2 =
-      this->ConvertToRelativePath(tgt, cmOutputConverter::HOME_OUTPUT);
+    std::string tgt2 = this->Convert(tgt, cmOutputConverter::HOME_OUTPUT);
 
     // The target may have been written with windows paths.
     cmSystemTools::ConvertToOutputSlashes(tgt2);

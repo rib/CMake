@@ -38,6 +38,8 @@ public:
    */
   enum RelativeRoot
   {
+    NONE,
+    FULL,
     HOME,
     START,
     HOME_OUTPUT,
@@ -45,6 +47,7 @@ public:
   };
   enum OutputFormat
   {
+    UNCHANGED,
     MAKERULE,
     SHELL,
     WATCOMQUOTE,
@@ -53,9 +56,7 @@ public:
   std::string ConvertToOutputFormat(const std::string& source,
                                     OutputFormat output) const;
   std::string Convert(const std::string& remote, RelativeRoot local,
-                      OutputFormat output) const;
-  std::string ConvertToRelativePath(const std::string& remote,
-                                    RelativeRoot local) const;
+                      OutputFormat output = UNCHANGED) const;
   std::string ConvertDirectorySeparatorsForShell(
     const std::string& source) const;
 

@@ -41,7 +41,7 @@ void cmLocalNinjaGenerator::Generate()
 {
   // Compute the path to use when referencing the current output
   // directory from the top output directory.
-  this->HomeRelativeOutputPath = this->ConvertToRelativePath(
+  this->HomeRelativeOutputPath = this->Convert(
     this->GetCurrentBinaryDirectory(), cmOutputConverter::HOME_OUTPUT);
   if (this->HomeRelativeOutputPath == ".") {
     this->HomeRelativeOutputPath = "";
@@ -132,11 +132,9 @@ std::string cmLocalNinjaGenerator::ConvertToIncludeReference(
   std::string const& path, cmOutputConverter::OutputFormat format,
   bool forceFullPaths)
 {
-  if (forceFullPaths) {
-    return this->ConvertToOutputFormat(cmSystemTools::CollapseFullPath(path),
-                                       format);
-  }
-  return this->Convert(path, cmOutputConverter::HOME_OUTPUT, format);
+  return this->Convert(path, forceFullPaths ? cmOutputConverter::FULL
+                                            : cmOutputConverter::HOME_OUTPUT,
+                       format);
 }
 
 // Private methods.
@@ -489,13 +487,12 @@ std::string cmLocalNinjaGenerator::MakeCustomLauncher(
   std::string output;
   const std::vector<std::string>& outputs = ccg.GetOutputs();
   if (!outputs.empty()) {
-    if (ccg.GetWorkingDirectory().empty()) {
-      output = this->Convert(outputs[0], cmOutputConverter::START_OUTPUT,
-                             cmOutputConverter::SHELL);
-    } else {
-      output =
-        this->ConvertToOutputFormat(outputs[0], cmOutputConverter::SHELL);
-    }
+    cmOutputConverter::RelativeRoot relative_root =
+      ccg.GetWorkingDirectory().empty() ? cmOutputConverter::START_OUTPUT
+                                        : cmOutputConverter::NONE;
+
+    output =
+      this->Convert(outputs[0], relative_root, cmOutputConverter::SHELL);
   }
   vars.Output = output.c_str();
 
