@@ -665,14 +665,16 @@ void cmLocalUnixMakefileGenerator3::WriteMakeVariables(
   makefileStream
     << "# The top-level source directory on which CMake was run.\n"
     << "CMAKE_SOURCE_DIR = "
-    << this->ConvertToOutputFormat(cmSystemTools::CollapseFullPath(this->GetSourceDirectory()),
+    << this->ConvertToOutputFormat(
+      cmSystemTools::CollapseFullPath(this->GetSourceDirectory()),
                      cmOutputConverter::SHELL)
     << "\n"
     << "\n";
   makefileStream
     << "# The top-level build directory on which CMake was run.\n"
     << "CMAKE_BINARY_DIR = "
-    << this->ConvertToOutputFormat(cmSystemTools::CollapseFullPath(this->GetBinaryDirectory()),
+    << this->ConvertToOutputFormat(
+      cmSystemTools::CollapseFullPath(this->GetBinaryDirectory()),
                      cmOutputConverter::SHELL)
     << "\n"
     << "\n";
