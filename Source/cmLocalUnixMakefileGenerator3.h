@@ -250,7 +250,7 @@ protected:
   void CheckMultipleOutputs(bool verbose);
 
 private:
-  std::string MaybeConvertWacomShellCommand(std::string const& cmd);
+  std::string MaybeConvertWatcomShellCommand(std::string const& cmd);
 
   void ComputeObjectFilenames(
     std::map<cmSourceFile const*, std::string>& mapping,
