@@ -592,7 +592,7 @@ void cmLocalUnixMakefileGenerator3::WriteMakeRule(
   }
 }
 
-std::string cmLocalUnixMakefileGenerator3::MaybeConvertWacomShellCommand(
+std::string cmLocalUnixMakefileGenerator3::MaybeConvertWatcomShellCommand(
   std::string const& cmd)
 {
   if (this->IsWatcomWMake() && cmSystemTools::FileIsFullPath(cmd.c_str()) &&
@@ -638,7 +638,7 @@ void cmLocalUnixMakefileGenerator3::WriteMakeVariables(
   }
 
   std::string cmakeShellCommand =
-    this->MaybeConvertWacomShellCommand(cmSystemTools::GetCMakeCommand());
+    this->MaybeConvertWatcomShellCommand(cmSystemTools::GetCMakeCommand());
   if (cmakeShellCommand.empty()) {
     cmakeShellCommand = this->ConvertToOutputFormat(
       cmSystemTools::CollapseFullPath(cmSystemTools::GetCMakeCommand()),
@@ -1007,7 +1007,7 @@ void cmLocalUnixMakefileGenerator3::AppendCustomCommand(
         }
       }
 
-      std::string shellCommand = this->MaybeConvertWacomShellCommand(cmd);
+      std::string shellCommand = this->MaybeConvertWatcomShellCommand(cmd);
       if (shellCommand.empty()) {
         shellCommand =
           this->ConvertToOutputFormat(cmd, cmOutputConverter::SHELL);
