@@ -485,7 +485,7 @@ int main(void) { return 0; }
       # libuv does not support Cygwin
       set(CMAKE_USE_LIBUV 0)
     elseif(CMAKE_SYSTEM_NAME STREQUAL "HP-UX")
-      # libuv does not support HP-UX
+      # Disable until it can be ported.
       set(CMAKE_USE_LIBUV 0)
     elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "sparc")
       # Disable until it can be ported.
