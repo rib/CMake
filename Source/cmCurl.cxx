@@ -13,6 +13,12 @@
 
 #include "cmThirdParty.h"
 
+#if !defined(CMAKE_USE_SYSTEM_CURL) && !defined(_WIN32) &&                    \
+  !defined(__APPLE__) && !defined(CURL_CA_BUNDLE) && !defined(CURL_CA_PATH)
+#define CMAKE_FIND_CAFILE
+#include "cmSystemTools.h"
+#endif
+
 // curl versions before 7.21.5 did not provide this error code
 #if defined(LIBCURL_VERSION_NUM) && LIBCURL_VERSION_NUM < 0x071505
 #define CURLE_NOT_BUILT_IN 4
@@ -32,8 +38,7 @@ std::string cmCurlSetCAInfo(::CURL* curl, const char* cafile)
     ::CURLcode res = ::curl_easy_setopt(curl, CURLOPT_CAINFO, cafile);
     check_curl_result(res, "Unable to set TLS/SSL Verify CAINFO: ");
   }
-#if !defined(CMAKE_USE_SYSTEM_CURL) && !defined(_WIN32) &&                    \
-  !defined(__APPLE__) && !defined(CURL_CA_BUNDLE) && !defined(CURL_CA_PATH)
+#ifdef CMAKE_FIND_CAFILE
 #define CMAKE_CAFILE_FEDORA "/etc/pki/tls/certs/ca-bundle.crt"
   else if (cmSystemTools::FileExists(CMAKE_CAFILE_FEDORA, true)) {
     ::CURLcode res =
