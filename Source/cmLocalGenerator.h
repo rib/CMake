@@ -24,7 +24,6 @@
 #include <iosfwd>
 #include <map>
 #include <set>
-#include <stdint.h>
 #include <string.h>
 #include <string>
 #include <vector>

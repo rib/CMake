@@ -11,6 +11,8 @@
 ============================================================================*/
 #include "cmCommandArgumentParserHelper.h"
 
+#include <cm_kwiml.h>
+
 #include "cmCommandArgumentLexer.h"
 #include "cmMakefile.h"
 #include "cmState.h"
