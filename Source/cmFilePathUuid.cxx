@@ -15,7 +15,11 @@
 #include "cmCryptoHash.h"
 #include "cmMakefile.h"
 #include "cmSystemTools.h"
+#include "cm_auto_ptr.hxx"
 #include "cmsys/Base64.h"
+
+#include <algorithm>
+#include <vector>
 
 cmFilePathUuid::cmFilePathUuid(cmMakefile* makefile)
 {

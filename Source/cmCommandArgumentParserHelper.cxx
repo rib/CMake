@@ -11,12 +11,16 @@
 ============================================================================*/
 #include "cmCommandArgumentParserHelper.h"
 
+#include "cmCommandArgumentLexer.h"
 #include "cmMakefile.h"
-#include "cmOutputConverter.h"
 #include "cmState.h"
 #include "cmSystemTools.h"
+#include "cmake.h"
 
-#include "cmCommandArgumentLexer.h"
+#include <cmConfigure.h>
+#include <iostream>
+#include <sstream>
+#include <string.h>
 
 int cmCommandArgument_yyparse(yyscan_t yyscanner);
 //

@@ -12,32 +12,38 @@
 #include "cmake.h"
 
 #include "cmAlgorithms.h"
-#include "cmCommand.h"
 #include "cmCommands.h"
+#include "cmDocumentation.h"
+#include "cmDocumentationEntry.h"
 #include "cmDocumentationFormatter.h"
 #include "cmExternalMakefileProjectGenerator.h"
 #include "cmFileTimeComparison.h"
+#include "cmGeneratorTarget.h"
+#include "cmGlobalGenerator.h"
+#include "cmGlobalGeneratorFactory.h"
 #include "cmLocalGenerator.h"
 #include "cmMakefile.h"
 #include "cmMessenger.h"
-#include "cmSourceFile.h"
 #include "cmState.h"
-#include "cmTest.h"
+#include "cmSystemTools.h"
+#include "cmTarget.h"
+#include "cmTargetLinkLibraryType.h"
 #include "cmUtils.hxx"
-#include "cmVersionMacros.h"
+#include "cmVersionConfig.h"
+#include "cm_auto_ptr.hxx"
 
 #if defined(CMAKE_BUILD_WITH_CMAKE)
 #include "cmGraphVizWriter.h"
 #include "cmVariableWatch.h"
-#include <cmsys/SystemInformation.hxx>
-
-#include "cm_jsoncpp_value.h"
-#include "cm_jsoncpp_writer.h"
+#include <cm_jsoncpp_value.h>
+#include <cm_jsoncpp_writer.h>
 #endif
 
 #include <cmsys/FStream.hxx>
 #include <cmsys/Glob.hxx>
 #include <cmsys/RegularExpression.hxx>
+#include <stdio.h>
+#include <string.h>
 
 // only build kdevelop generator on non-windows platforms
 // when not bootstrapping cmake
@@ -69,6 +75,7 @@
 #include "cmGlobalVisualStudio71Generator.h"
 #include "cmGlobalVisualStudio8Generator.h"
 #include "cmGlobalVisualStudio9Generator.h"
+
 #define CMAKE_HAVE_VS_GENERATORS
 #endif
 #include "cmGlobalMSYSMakefileGenerator.h"
@@ -90,6 +97,8 @@
 #include "cmExtraKateGenerator.h"
 #include "cmExtraSublimeTextGenerator.h"
 
+class cmCommand;
+
 #ifdef CMAKE_USE_KDEVELOP
 #include "cmGlobalKdevelopGenerator.h"
 #endif
@@ -103,17 +112,20 @@
 #if defined(__APPLE__)
 #if defined(CMAKE_BUILD_WITH_CMAKE)
 #include "cmGlobalXCodeGenerator.h"
+
 #define CMAKE_USE_XCODE 1
 #endif
 #include <sys/resource.h>
 #include <sys/time.h>
 #endif
 
-#include <sys/types.h>
 // include sys/stat.h after sys/types.h
+#include <algorithm>
+#include <iostream>
+#include <sstream>
 #include <sys/stat.h> // struct stat
-
-#include <list>
+#include <unordered_map>
+#include <utility>
 
 namespace {
 

@@ -11,7 +11,7 @@
 ============================================================================*/
 #include "cmCurl.h"
 
-#include "cmSystemTools.h"
+#include "cmThirdParty.h"
 
 // curl versions before 7.21.5 did not provide this error code
 #if defined(LIBCURL_VERSION_NUM) && LIBCURL_VERSION_NUM < 0x071505
