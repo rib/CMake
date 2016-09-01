@@ -39,12 +39,6 @@
 #include <cm_jsoncpp_writer.h>
 #endif
 
-#include <cmsys/FStream.hxx>
-#include <cmsys/Glob.hxx>
-#include <cmsys/RegularExpression.hxx>
-#include <stdio.h>
-#include <string.h>
-
 // only build kdevelop generator on non-windows platforms
 // when not bootstrapping cmake
 #if !defined(_WIN32)
@@ -97,8 +91,6 @@
 #include "cmExtraKateGenerator.h"
 #include "cmExtraSublimeTextGenerator.h"
 
-class cmCommand;
-
 #ifdef CMAKE_USE_KDEVELOP
 #include "cmGlobalKdevelopGenerator.h"
 #endif
@@ -106,8 +98,6 @@ class cmCommand;
 #ifdef CMAKE_USE_ECLIPSE
 #include "cmExtraEclipseCDT4Generator.h"
 #endif
-
-#include <stdlib.h> // required for atoi
 
 #if defined(__APPLE__)
 #if defined(CMAKE_BUILD_WITH_CMAKE)
@@ -119,13 +109,22 @@ class cmCommand;
 #include <sys/time.h>
 #endif
 
+#include <sys/types.h>
 // include sys/stat.h after sys/types.h
+#include <sys/stat.h> // struct stat
+
 #include <algorithm>
+#include <cmsys/FStream.hxx>
+#include <cmsys/Glob.hxx>
+#include <cmsys/RegularExpression.hxx>
 #include <iostream>
 #include <sstream>
-#include <sys/stat.h> // struct stat
-#include <unordered_map>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <utility>
+
+class cmCommand;
 
 namespace {
 
