@@ -17,6 +17,9 @@
 #include "cmMakefile.h"
 #include "cmSystemTools.h"
 
+#include <algorithm>
+#include <vector>
+
 cmFilePathUuid::cmFilePathUuid(cmMakefile* makefile)
 {
   initParentDirs(makefile->GetCurrentSourceDirectory(),
