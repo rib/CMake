@@ -6,6 +6,9 @@ file(MAKE_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/root_dir/admindir/info")
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/root_dir/admindir/available" "")
 file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/root_dir/admindir/status" "")
 
+# some programs used by fakeroot require sbin in path so we should not
+# leave this to chance (programs: ldconfig and start-stop-daemon)
+set(ENV{PATH} "$ENV{PATH}:/usr/local/sbin:/usr/sbin:/sbin")
 
 execute_process(COMMAND ${FAKEROOT_EXECUTABLE} ${DPKG_EXECUTABLE}
       -i --force-not-root --root=${CMAKE_CURRENT_BINARY_DIR}/root_dir
