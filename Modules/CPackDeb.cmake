@@ -167,7 +167,8 @@
 #       based installers only) if set,
 #    - :variable:`CPACK_PACKAGE_DESCRIPTION_FILE` if set to non default location,
 #    - :variable:`CPACK_PACKAGE_DESCRIPTION_SUMMARY` if set,
-#    - :variable:`CPACK_PACKAGE_DESCRIPTION_FILE` default location content
+#    - :variable:`CPACK_PACKAGE_DESCRIPTION_FILE` default value if set,
+#    - or "no package description available"
 #
 # .. variable:: CPACK_DEBIAN_PACKAGE_SECTION
 #               CPACK_DEBIAN_<COMPONENT>_PACKAGE_SECTION
@@ -844,8 +845,10 @@ function(cpack_deb_prepare_package_vars)
       file(READ "${CPACK_PACKAGE_DESCRIPTION_FILE}" CPACK_DEBIAN_PACKAGE_DESCRIPTION)
     elseif(CPACK_PACKAGE_DESCRIPTION_SUMMARY)
       set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "${CPACK_PACKAGE_DESCRIPTION_SUMMARY}")
-    else() # use default package description file content
+    elseif(CPACK_PACKAGE_DESCRIPTION_FILE) # use default package description file content
       file(READ "${CPACK_PACKAGE_DESCRIPTION_FILE}" CPACK_DEBIAN_PACKAGE_DESCRIPTION)
+    else()
+      set(CPACK_DEBIAN_PACKAGE_DESCRIPTION "no package description available")
     endif()
   endif()
 
