@@ -437,8 +437,7 @@ int cmCPackDebGenerator::createDeb()
                       << filename_data_tar << "\" for writing" << std::endl);
       return 0;
     }
-    cmArchiveWrite data_tar(fileStream_data_tar,
-                            tar_compression_type,
+    cmArchiveWrite data_tar(fileStream_data_tar, tar_compression_type,
                             debian_archive_type);
 
     // uid/gid should be the one of the root user, and this root user has
