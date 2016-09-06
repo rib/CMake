@@ -163,8 +163,7 @@
 #  * Mandatory : YES
 #  * Default   :
 #
-#    - :variable:`CPACK_COMPONENT_<compName>_DESCRIPTION` (component
-#       based installers only) if set,
+#    - :variable:`CPACK_COMPONENT_<compName>_DESCRIPTION` (component based installers only) if set,
 #    - :variable:`CPACK_PACKAGE_DESCRIPTION_FILE` if set to non default location,
 #    - :variable:`CPACK_PACKAGE_DESCRIPTION_SUMMARY` if set,
 #    - :variable:`CPACK_PACKAGE_DESCRIPTION_FILE` default value if set,
