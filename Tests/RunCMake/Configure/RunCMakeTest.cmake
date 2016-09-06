@@ -1,6 +1,5 @@
 include(RunCMake)
 
-run_cmake(ContinueAfterError)
 run_cmake(CustomTargetAfterError)
 run_cmake(ErrorLogs)
 run_cmake(FailCopyFileABI)
