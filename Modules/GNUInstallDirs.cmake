@@ -103,18 +103,19 @@
 # Macros
 # ^^^^^^
 #
-# ::
+# .. command:: GNUInstallDirs_get_absolute_install_dir
 #
-#    GNUInstallDirs_get_absolute_install_dir(absvar var)
+#   ::
 #
-# Set the given variable ``absvar`` to the absolute path contained
-# within the variable ``var``.  This is to allow the computation of an
-# absolute path, accounting for all the special cases documented
-# above.  While this macro is used to compute the various
-# ``CMAKE_INSTALL_FULL_<dir>`` variables, it is exposed publicly to
-# allow users who create additional path variables to also compute
-# absolute paths where necessary, using the same logic.
+#     GNUInstallDirs_get_absolute_install_dir(absvar var)
 #
+#   Set the given variable ``absvar`` to the absolute path contained
+#   within the variable ``var``.  This is to allow the computation of an
+#   absolute path, accounting for all the special cases documented
+#   above.  While this macro is used to compute the various
+#   ``CMAKE_INSTALL_FULL_<dir>`` variables, it is exposed publicly to
+#   allow users who create additional path variables to also compute
+#   absolute paths where necessary, using the same logic.
 
 #=============================================================================
 # Copyright 2015 Alex Turbov <i.zaufi@gmail.com>
