@@ -2,6 +2,13 @@ set(failure_test_executables
   ${CMAKE_CURRENT_BINARY_DIR}/failure_test_targets)
 file(WRITE ${failure_test_executables} "")
 
+# Check if we should do anything. If the compiler doesn't support hidden
+# visibility, the failure tests won't fail, so just write an empty targets
+# list and punt.
+if(NOT WIN32 AND NOT CYGWIN AND NOT COMPILER_HAS_HIDDEN_VISIBILITY)
+  return()
+endif()
+
 # Read the input source file
 file(READ ${CMAKE_CURRENT_SOURCE_DIR}/exportheader_test.cpp content_post)
 set(content_pre "")
