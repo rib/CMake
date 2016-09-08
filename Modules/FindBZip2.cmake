@@ -64,6 +64,31 @@ if (BZIP2_FOUND)
    set(CMAKE_REQUIRED_LIBRARIES ${BZIP2_LIBRARIES})
    CHECK_SYMBOL_EXISTS(BZ2_bzCompressInit "bzlib.h" BZIP2_NEED_PREFIX)
    cmake_pop_check_state()
+
+    if(NOT TARGET BZip2::BZip2)
+      add_library(BZip2::BZip2 UNKNOWN IMPORTED)
+      set_target_properties(BZip2::BZip2 PROPERTIES
+        INTERFACE_INCLUDE_DIRECTORIES "${BZIP2_INCLUDE_DIRS}")
+
+      if(BZIP2_LIBRARY_RELEASE)
+        set_property(TARGET BZip2::BZip2 APPEND PROPERTY
+          IMPORTED_CONFIGURATIONS RELEASE)
+        set_target_properties(BZip2::BZip2 PROPERTIES
+          IMPORTED_LOCATION_RELEASE "${BZIP2_LIBRARY_RELEASE}")
+      endif()
+
+      if(BZIP2_LIBRARY_DEBUG)
+        set_property(TARGET BZip2::BZip2 APPEND PROPERTY
+          IMPORTED_CONFIGURATIONS DEBUG)
+        set_target_properties(BZip2::BZip2 PROPERTIES
+          IMPORTED_LOCATION_DEBUG "${BZIP2_LIBRARY_DEBUG}")
+      endif()
+
+      if(NOT BZIP2_LIBRARY_RELEASE AND NOT BZIP2_LIBRARY_DEBUG)
+        set_property(TARGET BZip2::BZip2 APPEND PROPERTY
+          IMPORTED_LOCATION "${BZIP2_LIBRARY}")
+      endif()
+    endif()
 endif ()
 
 mark_as_advanced(BZIP2_INCLUDE_DIR)
