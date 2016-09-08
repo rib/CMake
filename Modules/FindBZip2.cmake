@@ -4,7 +4,16 @@
 #
 # Try to find BZip2
 #
-# Once done this will define
+# IMPORTED Targets
+# ^^^^^^^^^^^^^^^^
+#
+# This module defines :prop_tgt:`IMPORTED` target ``BZip2::BZip2``, if
+# BZip2 has been found.
+#
+# Result Variables
+# ^^^^^^^^^^^^^^^^
+#
+# This module defines the following variables:
 #
 # ::
 #
