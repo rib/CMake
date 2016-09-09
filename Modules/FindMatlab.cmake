@@ -773,9 +773,10 @@ function(matlab_add_unit_test)
   endif()
 
   set(options NO_UNITTEST_FRAMEWORK)
-  set(oneValueArgs NAME UNITTEST_FILE TIMEOUT WORKING_DIRECTORY)
-  set(multiValueArgs UNITTEST_PRECOMMAND ADDITIONAL_PATH
-    MATLAB_ADDITIONAL_STARTUP_OPTIONS TEST_ARGS CUSTOM_TEST_COMMAND)
+  set(oneValueArgs NAME UNITTEST_FILE TIMEOUT WORKING_DIRECTORY
+    UNITTEST_PRECOMMAND CUSTOM_TEST_COMMAND)
+  set(multiValueArgs ADDITIONAL_PATH MATLAB_ADDITIONAL_STARTUP_OPTIONS
+    TEST_ARGS)
 
   set(prefix _matlab_unittest_prefix)
   cmake_parse_arguments(PARSE_ARGV 0 ${prefix} "${options}" "${oneValueArgs}" "${multiValueArgs}" )
