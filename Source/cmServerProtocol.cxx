@@ -268,6 +268,8 @@ const cmServerResponse cmServerProtocol1_0::Process(
 {
   assert(this->m_State >= STATE_ACTIVE);
 
+  if (request.Type == kCOMPUTE_TYPE)
+    return this->ProcessCompute(request);
   if (request.Type == kCONFIGURE_TYPE)
     return this->ProcessConfigure(request);
   if (request.Type == kGLOBAL_SETTINGS_TYPE)
@@ -281,6 +283,27 @@ const cmServerResponse cmServerProtocol1_0::Process(
 bool cmServerProtocol1_0::IsExperimental() const
 {
   return true;
+}
+
+cmServerResponse cmServerProtocol1_0::ProcessCompute(
+  const cmServerRequest& request)
+{
+  if (this->m_State > STATE_CONFIGURED) {
+    return request.ReportError("This build system was already generated.");
+  }
+  if (this->m_State < STATE_CONFIGURED) {
+    return request.ReportError("This project was not configured yet.");
+  }
+
+  cmake* cm = this->CMakeInstance();
+  int ret = cm->Generate();
+
+  if (ret < 0) {
+    return request.ReportError("Failed to compute build system.");
+  } else {
+    m_State = STATE_COMPUTED;
+    return request.Reply(Json::Value());
+  }
 }
 
 cmServerResponse cmServerProtocol1_0::ProcessConfigure(
