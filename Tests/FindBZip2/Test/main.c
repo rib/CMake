@@ -1,15 +1,15 @@
+#include <bzlib.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <bzlib.h>
 
 int main()
 {
   int chunksize = 1024;
-  FILE *file = fopen("test.bzip2", "wb");
-  char *buf = malloc(sizeof(char) * chunksize);
+  FILE* file = fopen("test.bzip2", "wb");
+  char* buf = malloc(sizeof(char) * chunksize);
   int error, rsize;
   unsigned int in, out;
-  BZFILE *bzfile = BZ2_bzWriteOpen(&error, file, 64, 1, 10);
+  BZFILE* bzfile = BZ2_bzWriteOpen(&error, file, 64, 1, 10);
 
   /* Don't actually write anything for the purposes of the test */
 
