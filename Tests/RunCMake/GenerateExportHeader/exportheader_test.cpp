@@ -72,17 +72,17 @@ int main()
     libshared::ExportedClass l;
     l.method();
     l.method_deprecated();
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__CYGWIN__)
     l.method_excluded();
 #else
-    //l.method_excluded(); LINK ERROR (NOT WIN32)
+    //l.method_excluded(); LINK ERROR (NOT WIN32 AND NOT CYGWIN)
 #endif
 
     use_int(l.data);
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__CYGWIN__)
     use_int(l.data_excluded);
 #else
-    //use_int(l.data_excluded); LINK ERROR (NOT WIN32)
+    //use_int(l.data_excluded); LINK ERROR (NOT WIN32 AND NOT CYGWIN)
 #endif
   }
 
