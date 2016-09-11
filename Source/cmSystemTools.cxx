@@ -1766,7 +1766,7 @@ bool cmSystemTools::CopyFileTime(const char* fromFile, const char* toFile)
   if (!GetFileTime(hFrom, &timeCreation, &timeLastAccess, &timeLastWrite)) {
     return false;
   }
-  return SetFileTime(hTo, &timeCreation, &timeLastAccess, &timeLastWrite);
+  return SetFileTime(hTo, &timeCreation, &timeLastAccess, &timeLastWrite) != 0;
 #else
   struct stat fromStat;
   if (stat(fromFile, &fromStat) < 0) {
@@ -1824,7 +1824,7 @@ bool cmSystemTools::FileTimeSet(const char* fname, cmSystemToolsFileTime* t)
     return false;
   }
   return SetFileTime(h, &t->timeCreation, &t->timeLastAccess,
-                     &t->timeLastWrite);
+                     &t->timeLastWrite) != 0;
 #else
   return utime(fname, &t->timeBuf) >= 0;
 #endif
