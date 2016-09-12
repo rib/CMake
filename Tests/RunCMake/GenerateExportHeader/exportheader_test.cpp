@@ -57,15 +57,15 @@ int main()
 {
   {
     libshared::Class l;
-    //l.method(); LINK ERROR
+    // l.method(); LINK ERROR
     l.method_exported();
-    //l.method_deprecated(); LINK ERROR
+    // l.method_deprecated(); LINK ERROR
     l.method_deprecated_exported();
-    //l.method_excluded(); LINK ERROR
+    // l.method_excluded(); LINK ERROR
 
-    //use_int(l.data); LINK ERROR
+    // use_int(l.data); LINK ERROR
     use_int(l.data_exported);
-    //use_int(l.data_excluded); LINK ERROR
+    // use_int(l.data_excluded); LINK ERROR
   }
 
   {
@@ -75,39 +75,39 @@ int main()
 #if defined(_WIN32) || defined(__CYGWIN__)
     l.method_excluded();
 #else
-    //l.method_excluded(); LINK ERROR (NOT WIN32 AND NOT CYGWIN)
+// l.method_excluded(); LINK ERROR (NOT WIN32 AND NOT CYGWIN)
 #endif
 
     use_int(l.data);
 #if defined(_WIN32) || defined(__CYGWIN__)
     use_int(l.data_excluded);
 #else
-    //use_int(l.data_excluded); LINK ERROR (NOT WIN32 AND NOT CYGWIN)
+// use_int(l.data_excluded); LINK ERROR (NOT WIN32 AND NOT CYGWIN)
 #endif
   }
 
   {
     libshared::ExcludedClass l;
-    //l.method(); LINK ERROR
+    // l.method(); LINK ERROR
     l.method_exported();
-    //l.method_deprecated(); LINK ERROR
+    // l.method_deprecated(); LINK ERROR
     l.method_deprecated_exported();
-    //l.method_excluded(); LINK ERROR
+    // l.method_excluded(); LINK ERROR
 
-    //use_int(l.data); LINK ERROR
+    // use_int(l.data); LINK ERROR
     use_int(l.data_exported);
-    //use_int(l.data_excluded); LINK ERROR
+    // use_int(l.data_excluded); LINK ERROR
   }
 
-  //libshared::function(); LINK ERROR
+  // libshared::function(); LINK ERROR
   libshared::function_exported();
-  //libshared::function_deprecated(); LINK ERROR
+  // libshared::function_deprecated(); LINK ERROR
   libshared::function_deprecated_exported();
-  //libshared::function_excluded(); LINK ERROR
+  // libshared::function_excluded(); LINK ERROR
 
-  //use_int(libshared::data); LINK ERROR
+  // use_int(libshared::data); LINK ERROR
   use_int(libshared::data_exported);
-  //use_int(libshared::data_excluded); LINK ERROR
+  // use_int(libshared::data_excluded); LINK ERROR
 
   {
     libstatic::Class l;
