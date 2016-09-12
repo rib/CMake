@@ -18,10 +18,6 @@ if(POLICY CMP0053)
 endif()
 project(CMake)
 
-if(CMAKE_VERSION VERSION_LESS 2.8.12.2)
-  message(WARNING "CMake >= 2.8.12.2 will soon be required.  You are using '${CMAKE_VERSION}'.")
-endif()
-
 if(CMAKE_BOOTSTRAP)
   # Running from bootstrap script.  Set local variable and remove from cache.
   set(CMAKE_BOOTSTRAP 1)
