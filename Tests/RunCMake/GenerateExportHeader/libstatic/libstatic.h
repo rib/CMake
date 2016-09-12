@@ -3,8 +3,7 @@
 
 #include "libstatic_export.h"
 
-namespace libstatic
-{
+namespace libstatic {
 
 class Class
 {

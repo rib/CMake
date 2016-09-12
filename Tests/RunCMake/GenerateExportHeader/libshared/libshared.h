@@ -3,8 +3,7 @@
 
 #include "libshared_export.h"
 
-namespace libshared
-{
+namespace libshared {
 
 class Class
 {

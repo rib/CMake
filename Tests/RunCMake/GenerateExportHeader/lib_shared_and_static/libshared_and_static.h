@@ -3,8 +3,7 @@
 
 #include "libshared_and_static_export.h"
 
-namespace libshared_and_static
-{
+namespace libshared_and_static {
 
 class Class
 {
@@ -15,7 +14,8 @@ public:
 
   int MYPREFIX_LIBSHARED_AND_STATIC_DEPRECATED method_deprecated() const;
 
-  int MYPREFIX_LIBSHARED_AND_STATIC_DEPRECATED_EXPORT method_deprecated_exported() const;
+  int MYPREFIX_LIBSHARED_AND_STATIC_DEPRECATED_EXPORT
+  method_deprecated_exported() const;
 
   int MYPREFIX_LIBSHARED_AND_STATIC_NO_EXPORT method_excluded() const;
 
@@ -49,7 +49,8 @@ public:
 
   int MYPREFIX_LIBSHARED_AND_STATIC_DEPRECATED method_deprecated() const;
 
-  int MYPREFIX_LIBSHARED_AND_STATIC_DEPRECATED_EXPORT method_deprecated_exported() const;
+  int MYPREFIX_LIBSHARED_AND_STATIC_DEPRECATED_EXPORT
+  method_deprecated_exported() const;
 
   int MYPREFIX_LIBSHARED_AND_STATIC_NO_EXPORT method_excluded() const;
 
@@ -66,7 +67,8 @@ int MYPREFIX_LIBSHARED_AND_STATIC_EXPORT function_exported();
 
 int MYPREFIX_LIBSHARED_AND_STATIC_DEPRECATED function_deprecated();
 
-int MYPREFIX_LIBSHARED_AND_STATIC_DEPRECATED_EXPORT function_deprecated_exported();
+int MYPREFIX_LIBSHARED_AND_STATIC_DEPRECATED_EXPORT
+function_deprecated_exported();
 
 int MYPREFIX_LIBSHARED_AND_STATIC_NO_EXPORT function_excluded();
 
