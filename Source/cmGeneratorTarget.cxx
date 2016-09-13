@@ -1162,7 +1162,23 @@ bool cmGeneratorTarget::NeedRelinkBeforeInstall(
   // If either a build or install tree rpath is set then the rpath
   // will likely change between the build tree and install tree and
   // this target must be relinked.
-  return this->HaveBuildTreeRPATH(config) || this->HaveInstallTreeRPATH();
+  bool have_rpath =
+    this->HaveBuildTreeRPATH(config) || this->HaveInstallTreeRPATH();
+  bool is_ninja =
+    this->LocalGenerator->GetGlobalGenerator()->GetName() == "Ninja";
+
+  if (have_rpath && is_ninja) {
+    std::ostringstream w;
+    w << "Ninja does not support relinking before installation "
+         "on non-ELF platforms. This has been detected as a \""
+      << this->Makefile->GetDefinition("CMAKE_EXECUTABLE_FORMAT")
+      << "\" platform.";
+
+    cmake* cm = this->LocalGenerator->GetCMakeInstance();
+    cm->IssueMessage(cmake::FATAL_ERROR, w.str(), this->GetBacktrace());
+  }
+
+  return have_rpath;
 }
 
 bool cmGeneratorTarget::IsChrpathUsed(const std::string& config) const
