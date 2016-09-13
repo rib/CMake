@@ -19,6 +19,13 @@
   std::cout << "FAILED: " << (m) << "\n";                                     \
   failed = 1
 
+#define cmAssert(exp, m)                                                      \
+  if ((exp)) {                                                                \
+    cmPassed(m);                                                              \
+  } else {                                                                    \
+    cmFailed(m);                                                              \
+  }
+
 int testSystemTools(int /*unused*/, char* /*unused*/ [])
 {
   int failed = 0;
@@ -26,81 +33,42 @@ int testSystemTools(int /*unused*/, char* /*unused*/ [])
   // Test cmSystemTools::UpperCase
   std::string str = "abc";
   std::string strupper = "ABC";
-  if (cmSystemTools::UpperCase(str) == strupper) {
-    cmPassed("cmSystemTools::UpperCase is working");
-  } else {
-    cmFailed("cmSystemTools::UpperCase is working");
-  }
+  cmAssert(cmSystemTools::UpperCase(str) == strupper,
+           "cmSystemTools::UpperCase");
 
   // ----------------------------------------------------------------------
   // Test cmSystemTools::strverscmp
-  if (cmSystemTools::strverscmp("", "") != 0) {
-    // empty string
-    cmFailed("cmSystemTools::strverscmp error empty string");
-  }
-  if (cmSystemTools::strverscmp("lib_1.1.0", "") < 0) {
-    // empty string goes first
-    cmFailed("cmSystemTools::strverscmp error empty string goes first");
-  }
-  if (cmSystemTools::strverscmp("abc", "ab") < 0) {
-    // shortest goes first
-    cmFailed("cmSystemTools::strverscmp shortest non digit");
-  }
-  if (cmSystemTools::strverscmp("12345", "123") < 0) {
-    // only numbers
-    cmFailed("cmSystemTools::strverscmp error only numbers");
-  }
-  if (cmSystemTools::strverscmp("12345", "00345") <
-      0) { // only numbers, same length
-    cmFailed("cmSystemTools::strverscmp error only numbers, same length");
-  }
-  if (cmSystemTools::strverscmp("12abcde", "12abcc") <= 0) {
-    cmFailed("cmSystemTools::strverscmp  standard order");
-  }
-  if (cmSystemTools::strverscmp("lib_1.10.0", "lib_1.1.0") < 0) {
-    // symmetric
-    cmFailed("cmSystemTools::strverscmp error /symmetric");
-  }
-  if (cmSystemTools::strverscmp("lib_1.1.0", "lib_1.001.000") <
-      0) { // multiple zeros
-    cmFailed("cmSystemTools::strverscmp error multiple zeros");
-  }
-  if (cmSystemTools::strverscmp("lib_1.2_2", "lib_1.2_10") >=
-      0) { // last number
-    cmFailed("cmSystemTools::strverscmp error last number");
-  }
-  if (cmSystemTools::strverscmp("lib", "lib") != 0) {
-    // same string
-    cmFailed("cmSystemTools::strverscmp error same string");
-  }
-  if (cmSystemTools::strverscmp("2lib", "21lib") >= 0) {
-    // suffix letter
-    cmFailed("cmSystemTools::strverscmp suffix letter");
-  }
-  if (cmSystemTools::strverscmp("002lib", "02lib") >= 0) {
-    // suffix letter decimal
-    cmFailed("cmSystemTools::strverscmp suffix letter decimal");
-  }
-  if (cmSystemTools::strverscmp("9a", "10") >= 0) {
-    // letter filler
-    cmFailed("cmSystemTools::strverscmp error letter filler");
-  }
-  if (cmSystemTools::strverscmp("01", "010") >= 0) {
-    // decimal comparison
-    cmFailed("cmSystemTools::strverscmp errordecimal comparison");
-  }
-  if (cmSystemTools::strverscmp("01", "0") >= 0) {
-    // zero and decimal
-    cmFailed("cmSystemTools::strverscmp error zero and decimal");
-  }
-  if (cmSystemTools::strverscmp("000", "00") >= 0) {
-    // zero and decimal
-    cmFailed("cmSystemTools::strverscmp error zero and decimal");
-  }
-  if (cmSystemTools::strverscmp("000", "0001") < 0) {
-    // zero and decimal
-    cmFailed("cmSystemTools::strverscmp leading zeros");
-  }
+  cmAssert(cmSystemTools::strverscmp("", "") == 0, "strverscmp empty string");
+  cmAssert(cmSystemTools::strverscmp("abc", "") > 0,
+           "strverscmp string vs empty string");
+  cmAssert(cmSystemTools::strverscmp("abc", "abc") == 0,
+           "strverscmp same string");
+  cmAssert(cmSystemTools::strverscmp("abd", "abc") > 0,
+           "strverscmp character string");
+  cmAssert(cmSystemTools::strverscmp("abc", "abd") < 0,
+           "strverscmp symmetric");
+  cmAssert(cmSystemTools::strverscmp("12345", "12344") > 0,
+           "strverscmp natural numbers");
+  cmAssert(cmSystemTools::strverscmp("100", "99") > 0,
+           "strverscmp natural numbers different digits");
+  cmAssert(cmSystemTools::strverscmp("12345", "00345") > 0,
+           "strverscmp natural against decimal (same length)");
+  cmAssert(cmSystemTools::strverscmp("99999999999999", "99999999999991") > 0,
+           "strverscmp natural overflow");
+  cmAssert(cmSystemTools::strverscmp("00000000000009", "00000000000001") > 0,
+           "strverscmp deciaml precision");
+  cmAssert(cmSystemTools::strverscmp("a.b.c.0", "a.b.c.000") > 0,
+           "strverscmp multiple zeros");
+  cmAssert(cmSystemTools::strverscmp("lib_1.2_10", "lib_1.2_2") > 0,
+           "strverscmp last number ");
+  cmAssert(cmSystemTools::strverscmp("12lib", "2lib") > 0,
+           "strverscmp first number ");
+  cmAssert(cmSystemTools::strverscmp("02lib", "002lib") > 0,
+           "strverscmp first number decimal ");
+  cmAssert(cmSystemTools::strverscmp("10", "9a") > 0,
+           "strverscmp letter filler ");
+  cmAssert(cmSystemTools::strverscmp("000", "0001") > 0,
+           "strverscmp zero and leading zeros  ");
 
   // test sorting using standard strvercmp input
   std::vector<std::string> testString;
