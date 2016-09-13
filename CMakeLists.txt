@@ -702,6 +702,15 @@ endif()
 # setup some Testing support (a macro defined in this file)
 CMAKE_SETUP_TESTING()
 
+# Check whether to build server mode or not:
+list(FIND CMAKE_CXX_COMPILE_FEATURES cxx_auto_type CMake_HAVE_CXX_AUTO_TYPE)
+list(FIND CMAKE_CXX_COMPILE_FEATURES cxx_range_for CMake_HAVE_CXX_RANGE_FOR)
+if(NOT CMake_TEST_EXTERNAL_CMAKE AND NOT CMAKE_BOOTSTRAP AND CMake_HAVE_CXX_AUTO_TYPE AND CMake_HAVE_CXX_RANGE_FOR AND CMAKE_USE_LIBUV)
+  set(CMake_HAVE_SERVER_MODE 1)
+else()
+  set(CMake_HAVE_SERVER_MODE 0)
+endif()
+
 if(NOT CMake_TEST_EXTERNAL_CMAKE)
   if(NOT CMake_VERSION_IS_RELEASE)
     if(CMAKE_C_COMPILER_ID STREQUAL "GNU" AND
