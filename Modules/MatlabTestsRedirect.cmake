@@ -80,8 +80,8 @@ if(NOT working_directory)
   set(working_directory "${output_directory}")
 endif()
 
-string(REPLACE "/" "_" log_file_name "${test_name}")
-set(Matlab_LOG_FILE "${working_directory}/${log_file_name}.log")
+string(REPLACE "/" "_" log_file_name "${test_name}.log")
+set(Matlab_LOG_FILE "${working_directory}/${log_file_name}")
 
 set(devnull)
 if(UNIX)
