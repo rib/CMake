@@ -11,6 +11,12 @@
 ============================================================================*/
 #include "kwsysPrivate.h"
 
+// Ignore Windows version levels defined by command-line flags.  This
+// source needs access to all APIs available on the host in order for
+// the test to run properly.  The test binary is not installed anyway.
+#undef _WIN32_WINNT
+#undef NTDDI_VERSION
+
 #include KWSYS_HEADER(Encoding.hxx)
 
 // Work-around CMake dependency scanning limitation.  This must
