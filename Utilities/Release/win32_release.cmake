@@ -27,7 +27,6 @@ get_filename_component(path "${CMAKE_CURRENT_LIST_FILE}" PATH)
 set(GIT_EXTRA "git config core.autocrlf true")
 if(CMAKE_CREATE_VERSION STREQUAL "nightly")
   # Some tests fail spuriously too often.
-  # ConsoleBuf fails on dash3win7 and nowhere else (??).
-  set(EXTRA_CTEST_ARGS "-E 'Qt5Autogen|ConsoleBuf'")
+  set(EXTRA_CTEST_ARGS "-E Qt5Autogen")
 endif()
 include(${path}/release_cmake.cmake)
