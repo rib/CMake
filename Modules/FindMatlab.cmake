@@ -635,7 +635,7 @@ function(matlab_get_version_from_matlab_run matlab_binary_program matlab_list_ve
     set(devnull INPUT_FILE NUL)
   endif()
 
-  # timeout set to 120 seconds, in case it does not start
+  # timeout set to 30 seconds, in case it does not start
   # note as said before OUTPUT_VARIABLE cannot be used in a platform
   # independent manner however, not setting it would flush the output of Matlab
   # in the current console (unix variant)
@@ -644,17 +644,12 @@ function(matlab_get_version_from_matlab_run matlab_binary_program matlab_list_ve
     OUTPUT_VARIABLE _matlab_version_from_cmd_dummy
     RESULT_VARIABLE _matlab_result_version_call
     ERROR_VARIABLE _matlab_result_version_call_error
-    TIMEOUT 120
+    TIMEOUT 30
     WORKING_DIRECTORY "${_matlab_temporary_folder}"
     ${devnull}
     )
-  if("${_matlab_result_version_call}" MATCHES "timeout")
-    if(MATLAB_FIND_DEBUG)
-      message(WARNING "[MATLAB] Unable to determine the version of Matlab."
-        " Matlab call timed out after 120 seconds.")
-    endif()
-    return()
-  endif()
+
+
   if(${_matlab_result_version_call})
     if(MATLAB_FIND_DEBUG)
       message(WARNING "[MATLAB] Unable to determine the version of Matlab. Matlab call returned with error ${_matlab_result_version_call}.")
@@ -703,6 +698,7 @@ function(matlab_get_version_from_matlab_run matlab_binary_program matlab_list_ve
 
 endfunction()
 
+
 #.rst:
 # .. command:: matlab_add_unit_test
 #
@@ -724,7 +720,6 @@ endfunction()
 #     matlab_add_unit_test(
 #         NAME <name>
 #         UNITTEST_FILE matlab_file_containing_unittest.m
-#         [CUSTOM_MATLAB_COMMAND matlab_command_to_run_as_test]
 #         [UNITTEST_PRECOMMAND matlab_command_to_run]
 #         [TIMEOUT timeout]
 #         [ADDITIONAL_PATH path1 [path2 ...]]
@@ -740,11 +735,6 @@ endfunction()
 #   ``UNITTEST_FILE``
 #     the matlab unittest file. Its path will be automatically
 #     added to the Matlab path.
-#   ``CUSTOM_MATLAB_COMMAND``
-#     Matlab script command to run as the test.
-#     IIf this is not set, then the following is run:
-#     "runtests('matlab_file_name'), exit(max([ans(1,:).Failed]))
-#     matlab_file_name comes from UNITTEST_FILE without the .m.
 #   ``UNITTEST_PRECOMMAND``
 #     Matlab script command to be ran before the file
 #     containing the test (eg. GPU device initialisation based on CMake
@@ -758,7 +748,6 @@ endfunction()
 #   ``MATLAB_ADDITIONAL_STARTUP_OPTIONS``
 #     a list of additional option in order
 #     to run Matlab from the command line.
-#     -nosplash -nodesktop -nodisplay are always added.
 #   ``TEST_ARGS``
 #     Additional options provided to the add_test command. These
 #     options are added to the default options (eg. "CONFIGURATIONS Release")
@@ -773,13 +762,11 @@ function(matlab_add_unit_test)
   endif()
 
   set(options NO_UNITTEST_FRAMEWORK)
-  set(oneValueArgs NAME UNITTEST_FILE TIMEOUT WORKING_DIRECTORY
-    UNITTEST_PRECOMMAND CUSTOM_TEST_COMMAND)
-  set(multiValueArgs ADDITIONAL_PATH MATLAB_ADDITIONAL_STARTUP_OPTIONS
-    TEST_ARGS)
+  set(oneValueArgs NAME UNITTEST_PRECOMMAND UNITTEST_FILE TIMEOUT)
+  set(multiValueArgs ADDITIONAL_PATH MATLAB_ADDITIONAL_STARTUP_OPTIONS TEST_ARGS)
 
   set(prefix _matlab_unittest_prefix)
-  cmake_parse_arguments(PARSE_ARGV 0 ${prefix} "${options}" "${oneValueArgs}" "${multiValueArgs}" )
+  cmake_parse_arguments(${prefix} "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN} )
 
   if(NOT ${prefix}_NAME)
     message(FATAL_ERROR "[MATLAB] The Matlab test name cannot be empty")
@@ -787,17 +774,15 @@ function(matlab_add_unit_test)
 
   add_test(NAME ${${prefix}_NAME}
            COMMAND ${CMAKE_COMMAND}
-            "-Dtest_name=${${prefix}_NAME}"
-            "-Dadditional_paths=${${prefix}_ADDITIONAL_PATH}"
-            "-Dtest_timeout=${${prefix}_TIMEOUT}"
-            "-Doutput_directory=${_matlab_temporary_folder}"
-            "-Dworking_directory=${${prefix}_WORKING_DIRECTORY}"
-            "-DMatlab_PROGRAM=${Matlab_MAIN_PROGRAM}"
-            "-Dno_unittest_framework=${${prefix}_NO_UNITTEST_FRAMEWORK}"
-            "-DMatlab_ADDITIONNAL_STARTUP_OPTIONS=${${prefix}_MATLAB_ADDITIONAL_STARTUP_OPTIONS}"
-            "-Dunittest_file_to_run=${${prefix}_UNITTEST_FILE}"
-            "-Dcustom_Matlab_test_command=${${prefix}_CUSTOM_TEST_COMMAND}"
-            "-Dcmd_to_run_before_test=${${prefix}_UNITTEST_PRECOMMAND}"
+            -Dtest_name=${${prefix}_NAME}
+            -Dadditional_paths=${${prefix}_ADDITIONAL_PATH}
+            -Dtest_timeout=${${prefix}_TIMEOUT}
+            -Doutput_directory=${_matlab_temporary_folder}
+            -DMatlab_PROGRAM=${Matlab_MAIN_PROGRAM}
+            -Dno_unittest_framework=${${prefix}_NO_UNITTEST_FRAMEWORK}
+            -DMatlab_ADDITIONNAL_STARTUP_OPTIONS=${${prefix}_MATLAB_ADDITIONAL_STARTUP_OPTIONS}
+            -Dunittest_file_to_run=${${prefix}_UNITTEST_FILE}
+            -Dcmd_to_run_before_test=${${prefix}_UNITTEST_PRECOMMAND}
             -P ${_FindMatlab_SELF_DIR}/MatlabTestsRedirect.cmake
            ${${prefix}_TEST_ARGS}
            ${${prefix}_UNPARSED_ARGUMENTS}
@@ -1049,7 +1034,7 @@ function(_Matlab_get_version_from_root matlab_root matlab_known_version matlab_f
   if(${list_of_all_versions_length} GREATER 0)
     list(GET matlab_list_of_all_versions 0 _matlab_version_tmp)
   else()
-    set(_matlab_version_tmp "unknown")
+    set(_matlab_version_tmp "")
   endif()
 
   # set the version into the cache
