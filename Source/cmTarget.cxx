@@ -85,6 +85,8 @@ void cmTarget::SetType(cmState::TargetType type, const std::string& name)
 
 cmTarget cmTarget::CopyForDirectory(cmMakefile* mf) const
 {
+  assert(this->GetType() == cmState::GLOBAL_TARGET);
+  assert(this->GetMakefile() == CM_NULLPTR);
   cmTarget result(*this);
   result.SetMakefile(mf);
   return result;
