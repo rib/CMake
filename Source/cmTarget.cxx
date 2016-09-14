@@ -83,6 +83,13 @@ void cmTarget::SetType(cmState::TargetType type, const std::string& name)
   }
 }
 
+cmTarget cmTarget::CopyForDirectory(cmMakefile* mf) const
+{
+  cmTarget result(*this);
+  result.SetMakefile(mf);
+  return result;
+}
+
 void cmTarget::SetMakefile(cmMakefile* mf)
 {
   // Set our makefile.
