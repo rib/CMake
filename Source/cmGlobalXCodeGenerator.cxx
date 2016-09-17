@@ -351,6 +351,13 @@ void cmGlobalXCodeGenerator::SetGenerationRoot(cmLocalGenerator* root)
 {
   this->CurrentProject = root->GetProjectName();
   this->SetCurrentLocalGenerator(root);
+  cmSystemTools::SplitPath(
+    this->CurrentLocalGenerator->GetCurrentSourceDirectory(),
+    this->ProjectSourceDirectoryComponents);
+  cmSystemTools::SplitPath(
+    this->CurrentLocalGenerator->GetCurrentBinaryDirectory(),
+    this->ProjectOutputDirectoryComponents);
+
   this->CurrentXCodeHackMakefile = root->GetCurrentBinaryDirectory();
   this->CurrentXCodeHackMakefile += "/CMakeScripts";
   cmSystemTools::MakeDirectory(this->CurrentXCodeHackMakefile.c_str());
@@ -889,6 +896,10 @@ void cmGlobalXCodeGenerator::SetCurrentLocalGenerator(cmLocalGenerator* gen)
 {
   this->CurrentLocalGenerator = gen;
   this->CurrentMakefile = gen->GetMakefile();
+  std::string outdir = cmSystemTools::CollapseFullPath(
+    this->CurrentLocalGenerator->GetCurrentBinaryDirectory());
+  cmSystemTools::SplitPath(outdir, this->CurrentOutputDirectoryComponents);
+
   // Select the current set of configuration types.
   this->CurrentConfigurationTypes.clear();
   this->CurrentMakefile->GetConfigurations(this->CurrentConfigurationTypes);
@@ -3317,14 +3328,14 @@ std::string cmGlobalXCodeGenerator::RelativeToSource(const char* p)
 {
   // We force conversion because Xcode breakpoints do not work unless
   // they are in a file named relative to the source tree.
-  return this->CurrentLocalGenerator->ForceToRelativePath(
-    this->CurrentLocalGenerator->GetCurrentSourceDirectory(), p);
+  return this->CurrentLocalGenerator->ConvertToRelativePath(
+    this->ProjectSourceDirectoryComponents, p, true);
 }
 
 std::string cmGlobalXCodeGenerator::RelativeToBinary(const char* p)
 {
   return this->CurrentLocalGenerator->ConvertToRelativePath(
-    this->CurrentLocalGenerator->GetCurrentBinaryDirectory(), p);
+    this->ProjectOutputDirectoryComponents, p);
 }
 
 std::string cmGlobalXCodeGenerator::XCodeEscapePath(const std::string& p)

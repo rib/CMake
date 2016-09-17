@@ -642,8 +642,7 @@ void cmNinjaNormalTargetGenerator::WriteLinkStatement()
       }
     }
   }
-  // If we have any PRE_LINK commands, we need to go back to CMAKE_BINARY_DIR
-  // for
+  // If we have any PRE_LINK commands, we need to go back to HOME_OUTPUT for
   // the link commands.
   if (!preLinkCmdLines.empty()) {
     const std::string homeOutDir = localGen.ConvertToOutputFormat(

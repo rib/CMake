@@ -788,8 +788,8 @@ void cmLocalVisualStudio7Generator::WriteConfiguration(
       target->GetProperty("Fortran_MODULE_DIRECTORY");
     std::string modDir;
     if (target_mod_dir) {
-      modDir = this->ConvertToRelativePath(this->GetCurrentBinaryDirectory(),
-                                           target_mod_dir);
+      modDir = this->ConvertToRelativePath(target_mod_dir,
+                                           cmOutputConverter::START_OUTPUT);
     } else {
       modDir = ".";
     }
@@ -1298,11 +1298,10 @@ void cmLocalVisualStudio7GeneratorInternals::OutputLibraries(
   std::ostream& fout, ItemVector const& libs)
 {
   cmLocalVisualStudio7Generator* lg = this->LocalGenerator;
-  std::string currentBinDir = lg->GetCurrentBinaryDirectory();
   for (ItemVector::const_iterator l = libs.begin(); l != libs.end(); ++l) {
     if (l->IsPath) {
-      std::string rel =
-        lg->ConvertToRelativePath(currentBinDir, l->Value.c_str());
+      std::string rel = lg->ConvertToRelativePath(
+        l->Value.c_str(), cmOutputConverter::START_OUTPUT);
       fout << lg->ConvertToXMLOutputPath(rel.c_str()) << " ";
     } else if (!l->Target ||
                l->Target->GetType() != cmState::INTERFACE_LIBRARY) {
@@ -1317,13 +1316,13 @@ void cmLocalVisualStudio7GeneratorInternals::OutputObjects(
   // VS < 8 does not support per-config source locations so we
   // list object library content on the link line instead.
   cmLocalVisualStudio7Generator* lg = this->LocalGenerator;
-  std::string currentBinDir = lg->GetCurrentBinaryDirectory();
   std::vector<std::string> objs;
   gt->UseObjectLibraries(objs, "");
   const char* sep = isep ? isep : "";
   for (std::vector<std::string>::const_iterator oi = objs.begin();
        oi != objs.end(); ++oi) {
-    std::string rel = lg->ConvertToRelativePath(currentBinDir, oi->c_str());
+    std::string rel =
+      lg->ConvertToRelativePath(oi->c_str(), cmOutputConverter::START_OUTPUT);
     fout << sep << lg->ConvertToXMLOutputPath(rel.c_str());
     sep = " ";
   }
@@ -1333,7 +1332,6 @@ void cmLocalVisualStudio7Generator::OutputLibraryDirectories(
   std::ostream& fout, std::vector<std::string> const& dirs)
 {
   const char* comma = "";
-  std::string currentBinDir = this->GetCurrentBinaryDirectory();
   for (std::vector<std::string>::const_iterator d = dirs.begin();
        d != dirs.end(); ++d) {
     // Remove any trailing slash and skip empty paths.
@@ -1347,8 +1345,8 @@ void cmLocalVisualStudio7Generator::OutputLibraryDirectories(
 
     // Switch to a relative path specification if it is shorter.
     if (cmSystemTools::FileIsFullPath(dir.c_str())) {
-      std::string rel =
-        this->ConvertToRelativePath(currentBinDir, dir.c_str());
+      std::string rel = this->ConvertToRelativePath(
+        dir.c_str(), cmOutputConverter::START_OUTPUT);
       if (rel.size() < dir.size()) {
         dir = rel;
       }

@@ -382,7 +382,6 @@ void cmGlobalVisualStudio7Generator::WriteTargetsToSolution(
 {
   VisualStudioFolders.clear();
 
-  std::string rootBinaryDir = root->GetCurrentBinaryDirectory();
   for (OrderedTargetDependSet::const_iterator tt = projectTargets.begin();
        tt != projectTargets.end(); ++tt) {
     cmGeneratorTarget const* target = *tt;
@@ -406,7 +405,8 @@ void cmGlobalVisualStudio7Generator::WriteTargetsToSolution(
       if (vcprojName) {
         cmLocalGenerator* lg = target->GetLocalGenerator();
         std::string dir = lg->GetCurrentBinaryDirectory();
-        dir = root->ConvertToRelativePath(rootBinaryDir, dir.c_str());
+        dir = root->ConvertToRelativePath(dir.c_str(),
+                                          cmOutputConverter::START_OUTPUT);
         if (dir == ".") {
           dir = ""; // msbuild cannot handle ".\" prefix
         }

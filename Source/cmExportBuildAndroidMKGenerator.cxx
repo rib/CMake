@@ -48,7 +48,8 @@ void cmExportBuildAndroidMKGenerator::GenerateImportTargetCode(
   os << "LOCAL_MODULE := ";
   os << targetName << "\n";
   os << "LOCAL_SRC_FILES := ";
-  std::string path = cmSystemTools::ConvertToOutputPath(target->GetFullPath().c_str());
+  std::string path = target->GetLocalGenerator()->ConvertToOutputFormat(
+    target->GetFullPath(), cmOutputConverter::MAKERULE);
   os << path << "\n";
 }
 
