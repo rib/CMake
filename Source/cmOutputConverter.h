@@ -24,40 +24,14 @@ class cmOutputConverter
 public:
   cmOutputConverter(cmState::Snapshot snapshot);
 
-  /**
-   * Convert something to something else. This is a centralized conversion
-   * routine used by the generators to handle relative paths and the like.
-   * The flags determine what is actually done.
-   *
-   * relative: treat the argument as a directory and convert it to make it
-   * relative or full or unchanged. If relative (HOME, START etc) then that
-   * specifies what it should be relative to.
-   *
-   * output: make the result suitable for output to a...
-   *
-   * optional: should any relative path operation be controlled by the rel
-   * path setting
-   */
-  enum RelativeRoot
-  {
-    HOME,
-    START,
-    HOME_OUTPUT,
-    START_OUTPUT
-  };
   enum OutputFormat
   {
-    MAKERULE,
     SHELL,
     WATCOMQUOTE,
     RESPONSE
   };
   std::string ConvertToOutputFormat(const std::string& source,
                                     OutputFormat output) const;
-  std::string Convert(const std::string& remote, RelativeRoot local,
-                      OutputFormat output) const;
-  std::string ConvertToRelativePath(const std::string& remote,
-                                    RelativeRoot local) const;
   std::string ConvertDirectorySeparatorsForShell(
     const std::string& source) const;
 
@@ -136,14 +110,21 @@ public:
 
   /**
    * Convert the given remote path to a relative path with respect to
-   * the given local path.  The local path must be given in component
-   * form (see SystemTools::SplitPath) without a trailing slash.  The
-   * remote path must use forward slashes and not already be escaped
-   * or quoted.
+   * the given local path.  Both paths must use forward slashes and not
+   * already be escaped or quoted.
+   * The conversion is skipped if the paths are not both in the source
+   * or both in the binary tree.
    */
-  std::string ConvertToRelativePath(const std::vector<std::string>& local,
-                                    const std::string& in_remote,
-                                    bool force = false) const;
+  std::string ConvertToRelativePath(std::string const& local_path,
+                                    std::string const& remote_path) const;
+
+  /**
+   * Convert the given remote path to a relative path with respect to
+   * the given local path.  Both paths must use forward slashes and not
+   * already be escaped or quoted.
+   */
+  static std::string ForceToRelativePath(std::string const& local_path,
+                                         std::string const& remote_path);
 
 private:
   cmState* GetState() const;
