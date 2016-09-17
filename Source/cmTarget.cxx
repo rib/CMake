@@ -596,8 +596,8 @@ void cmTarget::GetTllSignatureTraces(std::ostream& s, TLLSignature sig) const
        it != this->TLLCommands.end(); ++it) {
     if (it->first == sig) {
       cmListFileContext lfc = it->second;
-      lfc.FilePath = converter.ConvertToRelativePath(
-        this->Makefile->GetState()->GetSourceDirectory(), lfc.FilePath);
+      lfc.FilePath =
+        converter.ConvertToRelativePath(lfc.FilePath, cmOutputConverter::HOME);
       s << " * " << lfc << std::endl;
     }
   }

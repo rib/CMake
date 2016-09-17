@@ -319,15 +319,18 @@ void cmGlobalUnixMakefileGenerator3::WriteMainCMakefile()
   std::string cache = this->GetCMakeInstance()->GetHomeOutputDirectory();
   cache += "/CMakeCache.txt";
 
-  std::string currentBinDir = lg->GetCurrentBinaryDirectory();
   // Save the list to the cmake file.
   cmakefileStream
     << "# The top level Makefile was generated from the following files:\n"
     << "set(CMAKE_MAKEFILE_DEPENDS\n"
-    << "  \"" << lg->ConvertToRelativePath(currentBinDir, cache) << "\"\n";
+    << "  \""
+    << lg->ConvertToRelativePath(cache, cmOutputConverter::START_OUTPUT)
+    << "\"\n";
   for (std::vector<std::string>::const_iterator i = lfiles.begin();
        i != lfiles.end(); ++i) {
-    cmakefileStream << "  \"" << lg->ConvertToRelativePath(currentBinDir, *i)
+    cmakefileStream << "  \""
+                    << lg->ConvertToRelativePath(
+                         *i, cmOutputConverter::START_OUTPUT)
                     << "\"\n";
   }
   cmakefileStream << "  )\n\n";
@@ -341,13 +344,14 @@ void cmGlobalUnixMakefileGenerator3::WriteMainCMakefile()
   cmakefileStream << "# The corresponding makefile is:\n"
                   << "set(CMAKE_MAKEFILE_OUTPUTS\n"
                   << "  \""
-                  << lg->ConvertToRelativePath(currentBinDir, makefileName)
+                  << lg->ConvertToRelativePath(makefileName,
+                                               cmOutputConverter::START_OUTPUT)
                   << "\"\n"
-                  << "  \"" << lg->ConvertToRelativePath(currentBinDir, check)
+                  << "  \""
+                  << lg->ConvertToRelativePath(check,
+                                               cmOutputConverter::START_OUTPUT)
                   << "\"\n";
   cmakefileStream << "  )\n\n";
-
-  const std::string binDir = lg->GetBinaryDirectory();
 
   // CMake must rerun if a byproduct is missing.
   {
@@ -357,7 +361,9 @@ void cmGlobalUnixMakefileGenerator3::WriteMainCMakefile()
       lg->GetMakefile()->GetOutputFiles();
     for (std::vector<std::string>::const_iterator k = outfiles.begin();
          k != outfiles.end(); ++k) {
-      cmakefileStream << "  \"" << lg->ConvertToRelativePath(binDir, *k)
+      cmakefileStream << "  \""
+                      << lg->ConvertToRelativePath(
+                           *k, cmOutputConverter::HOME_OUTPUT)
                       << "\"\n";
     }
 
@@ -369,7 +375,9 @@ void cmGlobalUnixMakefileGenerator3::WriteMainCMakefile()
       tmpStr = lg->GetCurrentBinaryDirectory();
       tmpStr += cmake::GetCMakeFilesDirectory();
       tmpStr += "/CMakeDirectoryInformation.cmake";
-      cmakefileStream << "  \"" << lg->ConvertToRelativePath(binDir, tmpStr)
+      cmakefileStream << "  \""
+                      << lg->ConvertToRelativePath(
+                           tmpStr, cmOutputConverter::HOME_OUTPUT)
                       << "\"\n";
     }
     cmakefileStream << "  )\n\n";
@@ -480,10 +488,9 @@ void cmGlobalUnixMakefileGenerator3::WriteDirectoryRules2(
   }
 
   // Begin the directory-level rules section.
-  std::string dir = cmSystemTools::ConvertToOutputPath(
-    lg->ConvertToRelativePath(lg->GetBinaryDirectory(),
-                              lg->GetCurrentBinaryDirectory())
-      .c_str());
+  std::string dir = lg->GetCurrentBinaryDirectory();
+  dir = lg->Convert(dir, cmOutputConverter::HOME_OUTPUT,
+                    cmOutputConverter::MAKERULE);
   lg->WriteDivider(ruleFileStream);
   ruleFileStream << "# Directory level rules for directory " << dir << "\n\n";
 
@@ -531,8 +538,7 @@ void cmGlobalUnixMakefileGenerator3::GenerateBuildCommand(
       tname += "/fast";
     }
     cmOutputConverter conv(mf->GetStateSnapshot());
-    tname =
-      conv.ConvertToRelativePath(mf->GetState()->GetBinaryDirectory(), tname);
+    tname = conv.ConvertToRelativePath(tname, cmOutputConverter::HOME_OUTPUT);
     cmSystemTools::ConvertToOutputSlashes(tname);
     makeCommand.push_back(tname);
     if (this->Makefiles.empty()) {
