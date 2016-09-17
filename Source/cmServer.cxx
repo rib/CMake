@@ -43,8 +43,8 @@ typedef struct
 void alloc_buffer(uv_handle_t* handle, size_t suggested_size, uv_buf_t* buf)
 {
   (void)handle;
-  *buf =
-    uv_buf_init(static_cast<char*>(malloc(suggested_size)), suggested_size);
+  *buf = uv_buf_init(static_cast<char*>(malloc(suggested_size)),
+                     static_cast<unsigned int>(suggested_size));
 }
 
 void free_write_req(uv_write_t* req)
@@ -66,8 +66,8 @@ void write_data(uv_stream_t* dest, std::string content, uv_write_cb cb)
 {
   write_req_t* req = static_cast<write_req_t*>(malloc(sizeof(write_req_t)));
   req->req.data = dest->data;
-  req->buf =
-    uv_buf_init(static_cast<char*>(malloc(content.size())), content.size());
+  req->buf = uv_buf_init(static_cast<char*>(malloc(content.size())),
+                         static_cast<unsigned int>(content.size()));
   memcpy(req->buf.base, content.c_str(), content.size());
   uv_write(reinterpret_cast<uv_write_t*>(req), static_cast<uv_stream_t*>(dest),
            &req->buf, 1, cb);
