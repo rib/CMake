@@ -428,16 +428,14 @@ bool cmDependsFortran::WriteDependenciesReal(const char* obj,
       std::string modFile = mod_dir;
       modFile += "/";
       modFile += *i;
-      modFile = this->LocalGenerator->ConvertToOutputFormat(
-        this->LocalGenerator->ConvertToRelativePath(binDir, modFile),
-        cmOutputConverter::SHELL);
+      modFile = this->LocalGenerator->Convert(
+        modFile, cmOutputConverter::HOME_OUTPUT, cmOutputConverter::SHELL);
       std::string stampFile = stamp_dir;
       stampFile += "/";
       stampFile += m;
       stampFile += ".mod.stamp";
-      stampFile = this->LocalGenerator->ConvertToOutputFormat(
-        this->LocalGenerator->ConvertToRelativePath(binDir, stampFile),
-        cmOutputConverter::SHELL);
+      stampFile = this->LocalGenerator->Convert(
+        stampFile, cmOutputConverter::HOME_OUTPUT, cmOutputConverter::SHELL);
       makeDepends << "\t$(CMAKE_COMMAND) -E cmake_copy_f90_mod " << modFile
                   << " " << stampFile;
       cmMakefile* mf = this->LocalGenerator->GetMakefile();
