@@ -54,10 +54,7 @@ std::string cmLocalCommonGenerator::GetTargetFortranFlags(
   }
 
   // Add a module output directory flag if necessary.
-  std::string mod_dir = target->GetFortranModuleDirectory(
-    this->WorkingDirectory == cmOutputConverter::HOME_OUTPUT
-      ? this->GetBinaryDirectory()
-      : this->GetCurrentBinaryDirectory());
+  std::string mod_dir = target->GetFortranModuleDirectory();
   if (!mod_dir.empty()) {
     mod_dir = this->ConvertToOutputFormat(
       this->ConvertToRelativePath(this->WorkingDirectory, mod_dir),

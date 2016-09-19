@@ -993,16 +993,12 @@ void cmMakefileTargetGenerator::WriteTargetDependRules()
     *this->InfoFileStream << "  )\n";
   }
 
-  std::string const& working_dir =
-    this->LocalGenerator->GetCurrentBinaryDirectory();
-
   /* clang-format off */
   *this->InfoFileStream
     << "\n"
     << "# Fortran module output directory.\n"
     << "set(CMAKE_Fortran_TARGET_MODULE_DIR \""
-    << this->GeneratorTarget->GetFortranModuleDirectory(working_dir)
-    << "\")\n";
+    << this->GeneratorTarget->GetFortranModuleDirectory() << "\")\n";
   /* clang-format on */
 
   // and now write the rule to use it
