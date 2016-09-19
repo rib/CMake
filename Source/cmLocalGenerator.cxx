@@ -181,8 +181,7 @@ void cmLocalGenerator::GenerateTestFiles()
   for (vec_t::const_iterator i = children.begin(); i != children.end(); ++i) {
     // TODO: Use add_subdirectory instead?
     std::string outP = i->GetDirectory().GetCurrentBinary();
-    outP = this->ConvertToRelativePath(parentBinDir,
-                                       outP);
+    outP = this->ConvertToRelativePath(parentBinDir, outP);
     outP = cmOutputConverter::EscapeForCMake(outP);
     fout << "subdirs(" << outP << ")" << std::endl;
   }
@@ -1410,7 +1409,9 @@ std::string cmLocalGenerator::ConvertToLinkReference(std::string const& lib,
 #endif
 
   // Normal behavior.
-  return this->Convert(lib, START_OUTPUT, format);
+  return this->ConvertToOutputFormat(
+    this->ConvertToRelativePath(this->GetCurrentBinaryDirectory(), lib),
+    format);
 }
 
 /**
