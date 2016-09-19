@@ -34,7 +34,7 @@
 
 cmLocalNinjaGenerator::cmLocalNinjaGenerator(cmGlobalGenerator* gg,
                                              cmMakefile* mf)
-  : cmLocalCommonGenerator(gg, mf, mf->GetState()->GetBinaryDirectory())
+  : cmLocalCommonGenerator(gg, mf, cmOutputConverter::HOME_OUTPUT)
   , HomeRelativeOutputPath("")
 {
   this->TargetImplib = "$TARGET_IMPLIB";
@@ -145,8 +145,7 @@ std::string cmLocalNinjaGenerator::ConvertToIncludeReference(
     return this->ConvertToOutputFormat(cmSystemTools::CollapseFullPath(path),
                                        format);
   }
-  return this->ConvertToOutputFormat(
-    this->ConvertToRelativePath(this->GetBinaryDirectory(), path), format);
+  return this->Convert(path, cmOutputConverter::HOME_OUTPUT, format);
 }
 
 // Private methods.
@@ -500,10 +499,8 @@ std::string cmLocalNinjaGenerator::MakeCustomLauncher(
   const std::vector<std::string>& outputs = ccg.GetOutputs();
   if (!outputs.empty()) {
     if (ccg.GetWorkingDirectory().empty()) {
-      output = this->ConvertToOutputFormat(
-        this->ConvertToRelativePath(this->GetCurrentBinaryDirectory(),
-                                    outputs[0]),
-        cmOutputConverter::SHELL);
+      output = this->Convert(outputs[0], cmOutputConverter::START_OUTPUT,
+                             cmOutputConverter::SHELL);
     } else {
       output =
         this->ConvertToOutputFormat(outputs[0], cmOutputConverter::SHELL);

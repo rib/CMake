@@ -94,7 +94,7 @@ static std::string cmSplitExtension(std::string const& in, std::string& base)
 
 cmLocalUnixMakefileGenerator3::cmLocalUnixMakefileGenerator3(
   cmGlobalGenerator* gg, cmMakefile* mf)
-  : cmLocalCommonGenerator(gg, mf, mf->GetCurrentBinaryDirectory())
+  : cmLocalCommonGenerator(gg, mf, cmOutputConverter::START_OUTPUT)
 {
   this->MakefileVariableSize = 0;
   this->ColorMakefile = false;
@@ -1002,10 +1002,8 @@ void cmLocalUnixMakefileGenerator3::AppendCustomCommand(
         const std::vector<std::string>& outputs = ccg.GetOutputs();
         if (!outputs.empty()) {
           if (workingDir.empty()) {
-            output = this->ConvertToOutputFormat(
-              this->ConvertToRelativePath(this->GetCurrentBinaryDirectory(),
-                                          outputs[0]),
-              cmOutputConverter::SHELL);
+            output = this->Convert(outputs[0], cmOutputConverter::START_OUTPUT,
+                                   cmOutputConverter::SHELL);
 
           } else {
             output = this->ConvertToOutputFormat(outputs[0],
@@ -1097,9 +1095,8 @@ void cmLocalUnixMakefileGenerator3::AppendCleanCommand(
     fout << ")\n";
   }
   std::string remove = "$(CMAKE_COMMAND) -P ";
-  remove += this->ConvertToOutputFormat(
-    this->ConvertToRelativePath(this->GetCurrentBinaryDirectory(), cleanfile),
-    cmOutputConverter::SHELL);
+  remove += this->Convert(cleanfile, cmOutputConverter::START_OUTPUT,
+                          cmOutputConverter::SHELL);
   commands.push_back(remove);
 
   // For the main clean rule add per-language cleaning.
