@@ -706,77 +706,6 @@
 #   symbolic link(s) is also on a relocatable path, relocating it during
 #   package installation may cause initial symbolic link to point to an
 #   invalid location.
-#
-# Packaging of sources (SRPM)
-# ^^^^^^^^^^^^^^^^^^^^^^^^^^^
-#
-# SRPM packaging is enabled by setting :variable:`CPACK_RPM_PACKAGE_SOURCES`
-# variable while usually using :variable:`CPACK_INSTALLED_DIRECTORIES` variable
-# to provide directory containing CMakeLists.txt and source files.
-#
-# For CMake projects SRPM package would be product by executing:
-#
-# ``cpack -G RPM --config ./CPackSourceConfig.cmake``
-#
-# .. note::
-#
-#  Produced SRPM package is expected to be built with :manual:`cmake(1)` executable
-#  and packaged with :manual:`cpack(1)` executable so CMakeLists.txt has to be
-#  located in root source directory and must be able to generate binary rpm
-#  packages by executing ``cpack -G`` command. The two executables as well as
-#  rpmbuild must also be present when generating binary rpm packages from the
-#  produced SRPM package.
-#
-# Once the SRPM package is generated it can be used to generate binary packages
-# by creating a directory structure for rpm generation and executing rpmbuild
-# tool:
-#
-# ``mkdir -p build_dir/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}``
-# ``rpmbuild --define "_topdir <path_to_build_dir>" --rebuild <SRPM_file_name>``
-#
-# Generated packages will be located in build_dir/RPMS directory or its sub
-# directories.
-#
-# .. note::
-#
-#  SRPM package internally uses CPack/RPM generator to generate binary packages
-#  so CMakeScripts.txt can decide during the SRPM to binary rpm generation step
-#  what content the package(s) should have as well as how they should be packaged
-#  (monolithic or components). CMake can decide this for e.g. by reading environment
-#  variables set by the package manager before starting the process of generating
-#  binary rpm packages. This way a single SRPM package can be used to produce
-#  different binary rpm packages on different platforms depending on the platform's
-#  packaging rules.
-#
-# Source RPM packaging has it's own set of variables:
-#
-# .. variable:: CPACK_RPM_PACKAGE_SOURCES
-#
-#  Should the content be packaged as a source rpm (default is binary rpm).
-#
-#  * Mandatory : NO
-#  * Default   : OFF
-#
-# .. note::
-#
-#  For cmake projects :variable:`CPACK_RPM_PACKAGE_SOURCES` variable is set
-#  to ``OFF`` in CPackConfig.cmake and ``ON`` in CPackSourceConfig.cmake
-#  generated files.
-#
-# .. variable:: CPACK_RPM_SOURCE_PKG_BUILD_PARAMS
-#
-#  Additional command-line parameters provided to :manual:`cmake(1)` executable.
-#
-#  * Mandatory : NO
-#  * Default   : -
-#
-# .. variable:: CPACK_RPM_SOURCE_PKG_PACKAGING_INSTALL_PREFIX
-#
-#  Packaging install prefix that would be provided in :variable:`CPACK_PACKAGING_INSTALL_PREFIX`
-#  variable for producing binary RPM packages.
-#
-#  * Mandatory : YES
-#  * Default   : "/"
 
 #=============================================================================
 # Copyright 2007-2016 Kitware, Inc.
@@ -1589,27 +1518,18 @@ function(cpack_rpm_generate_package)
      set(CPACK_RPM_COMPRESSION_TYPE_TMP "")
   endif()
 
-  if(NOT CPACK_RPM_PACKAGE_SOURCES)
-    if(CPACK_PACKAGE_RELOCATABLE OR CPACK_RPM_PACKAGE_RELOCATABLE)
-      if(CPACK_RPM_PACKAGE_DEBUG)
-        message("CPackRPM:Debug: Trying to build a relocatable package")
-      endif()
-      if(CPACK_SET_DESTDIR AND (NOT CPACK_SET_DESTDIR STREQUAL "I_ON"))
-        message("CPackRPM:Warning: CPACK_SET_DESTDIR is set (=${CPACK_SET_DESTDIR}) while requesting a relocatable package (CPACK_RPM_PACKAGE_RELOCATABLE is set): this is not supported, the package won't be relocatable.")
-        set(CPACK_RPM_PACKAGE_RELOCATABLE FALSE)
-      else()
-        set(CPACK_RPM_PACKAGE_PREFIX ${CPACK_PACKAGING_INSTALL_PREFIX}) # kept for back compatibility (provided external RPM spec files)
-        cpack_rpm_prepare_relocation_paths()
-        set(CPACK_RPM_PACKAGE_RELOCATABLE TRUE)
-      endif()
+  if(CPACK_PACKAGE_RELOCATABLE OR CPACK_RPM_PACKAGE_RELOCATABLE)
+    if(CPACK_RPM_PACKAGE_DEBUG)
+      message("CPackRPM:Debug: Trying to build a relocatable package")
     endif()
-  else()
-    if(CPACK_RPM_PACKAGE_COMPONENT)
-      message(FATAL_ERROR "CPACK_RPM_PACKAGE_SOURCES parameter can not be used"
-        " in combination with CPACK_RPM_PACKAGE_COMPONENT parameter!")
+    if(CPACK_SET_DESTDIR AND (NOT CPACK_SET_DESTDIR STREQUAL "I_ON"))
+      message("CPackRPM:Warning: CPACK_SET_DESTDIR is set (=${CPACK_SET_DESTDIR}) while requesting a relocatable package (CPACK_RPM_PACKAGE_RELOCATABLE is set): this is not supported, the package won't be relocatable.")
+      set(CPACK_RPM_PACKAGE_RELOCATABLE FALSE)
+    else()
+      set(CPACK_RPM_PACKAGE_PREFIX ${CPACK_PACKAGING_INSTALL_PREFIX}) # kept for back compatibility (provided external RPM spec files)
+      cpack_rpm_prepare_relocation_paths()
+      set(CPACK_RPM_PACKAGE_RELOCATABLE TRUE)
     endif()
-
-    set(CPACK_RPM_PACKAGE_RELOCATABLE FALSE) # disable relocatable option if building source RPM
   endif()
 
   # Check if additional fields for RPM spec header are given
@@ -1953,50 +1873,13 @@ function(cpack_rpm_generate_package)
     endif()
   endif()
 
-  if(CPACK_RPM_PACKAGE_SOURCES) # source rpm
-    set(archive_name_ "${CPACK_RPM_PACKAGE_NAME}-${CPACK_RPM_PACKAGE_VERSION}")
-
-    execute_process(
-        COMMAND ${CMAKE_COMMAND} -E tar "cfvz" "${CPACK_RPM_DIRECTORY}/SOURCES/${archive_name_}.tar.gz" "${CPACK_PACKAGE_FILE_NAME}"
-        WORKING_DIRECTORY ${CPACK_RPM_DIRECTORY}
-      )
-    set(TMP_RPM_SOURCE "Source: ${archive_name_}.tar.gz")
-
-    if(CPACK_RPM_BUILDREQUIRES)
-      set(TMP_RPM_BUILD_REQUIRES "BuildRequires: ${CPACK_RPM_BUILDREQUIRES}")
-    endif()
-
-    # Disable debuginfo packages - srpm generates invalid packages due to
-    # releasing controll to cpack to generate binary packages.
-    # Note however that this doesn't prevent cpack to generate debuginfo
-    # packages when run from srpm with --rebuild.
-    set(TMP_RPM_DISABLE_DEBUGINFO "%define debug_package %{nil}")
-
-    if(NOT CPACK_RPM_SOURCE_PKG_PACKAGING_INSTALL_PREFIX)
-      set(CPACK_RPM_SOURCE_PKG_PACKAGING_INSTALL_PREFIX "/")
-    endif()
-
-    set(TMP_RPM_BUILD
-      "
-%build
-mkdir cpack_rpm_build_dir
-cd cpack_rpm_build_dir
-cmake ${CPACK_RPM_SOURCE_PKG_BUILD_PARAMS} -DCPACK_PACKAGING_INSTALL_PREFIX=${CPACK_RPM_SOURCE_PKG_PACKAGING_INSTALL_PREFIX} ../${CPACK_PACKAGE_FILE_NAME}
-make %{?_smp_mflags}" # %{?_smp_mflags} -> -j option
-      )
-    set(TMP_RPM_INSTALL
-      "
-cd cpack_rpm_build_dir
-cpack -G RPM
-mv *.rpm %_rpmdir"
-      )
-    set(TMP_RPM_PREP "%setup -c")
-
-    set(RPMBUILD_FLAGS "-bs")
-
+  # We should generate a USER spec file template:
+  #  - either because the user asked for it : CPACK_RPM_GENERATE_USER_BINARY_SPECFILE_TEMPLATE
+  #  - or the user did not provide one : NOT CPACK_RPM_USER_BINARY_SPECFILE
+  if(CPACK_RPM_GENERATE_USER_BINARY_SPECFILE_TEMPLATE OR NOT CPACK_RPM_USER_BINARY_SPECFILE)
      file(WRITE ${CPACK_RPM_BINARY_SPECFILE}.in
       "# -*- rpm-spec -*-
-BuildRoot:      %_topdir/\@CPACK_PACKAGE_FILE_NAME\@
+BuildRoot:      \@CPACK_RPM_DIRECTORY\@/\@CPACK_PACKAGE_FILE_NAME\@\@CPACK_RPM_PACKAGE_COMPONENT_PART_PATH\@
 Summary:        \@CPACK_RPM_PACKAGE_SUMMARY\@
 Name:           \@CPACK_RPM_PACKAGE_NAME\@
 Version:        \@CPACK_RPM_PACKAGE_VERSION\@
@@ -2004,64 +1887,6 @@ Release:        \@CPACK_RPM_PACKAGE_RELEASE\@
 License:        \@CPACK_RPM_PACKAGE_LICENSE\@
 Group:          \@CPACK_RPM_PACKAGE_GROUP\@
 Vendor:         \@CPACK_RPM_PACKAGE_VENDOR\@
-
-\@TMP_RPM_SOURCE\@
-\@TMP_RPM_BUILD_REQUIRES\@
-\@TMP_RPM_BUILDARCH\@
-\@TMP_RPM_PREFIXES\@
-
-\@TMP_RPM_DISABLE_DEBUGINFO\@
-
-%define _rpmdir %_topdir/RPMS
-%define _srcrpmdir %_topdir/SRPMS
-\@FILE_NAME_DEFINE\@
-%define _unpackaged_files_terminate_build 0
-\@TMP_RPM_SPEC_INSTALL_POST\@
-\@CPACK_RPM_SPEC_MORE_DEFINE\@
-\@CPACK_RPM_COMPRESSION_TYPE_TMP\@
-
-%description
-\@CPACK_RPM_PACKAGE_DESCRIPTION\@
-
-# This is a shortcutted spec file generated by CMake RPM generator
-# we skip _install step because CPack does that for us.
-# We do only save CPack installed tree in _prepr
-# and then restore it in build.
-%prep
-\@TMP_RPM_PREP\@
-
-\@TMP_RPM_BUILD\@
-
-#p build
-
-%install
-\@TMP_RPM_INSTALL\@
-
-%clean
-
-%changelog
-\@CPACK_RPM_SPEC_CHANGELOG\@
-"
-    )
-  else()  # binary rpm
-
-    # We should generate a USER spec file template:
-    #  - either because the user asked for it : CPACK_RPM_GENERATE_USER_BINARY_SPECFILE_TEMPLATE
-    #  - or the user did not provide one : NOT CPACK_RPM_USER_BINARY_SPECFILE
-    if(CPACK_RPM_GENERATE_USER_BINARY_SPECFILE_TEMPLATE OR NOT CPACK_RPM_USER_BINARY_SPECFILE)
-      set(RPMBUILD_FLAGS "-bb")
-
-      file(WRITE ${CPACK_RPM_BINARY_SPECFILE}.in
-        "# -*- rpm-spec -*-
-BuildRoot:      %_topdir/\@CPACK_PACKAGE_FILE_NAME\@\@CPACK_RPM_PACKAGE_COMPONENT_PART_PATH\@
-Summary:        \@CPACK_RPM_PACKAGE_SUMMARY\@
-Name:           \@CPACK_RPM_PACKAGE_NAME\@
-Version:        \@CPACK_RPM_PACKAGE_VERSION\@
-Release:        \@CPACK_RPM_PACKAGE_RELEASE\@
-License:        \@CPACK_RPM_PACKAGE_LICENSE\@
-Group:          \@CPACK_RPM_PACKAGE_GROUP\@
-Vendor:         \@CPACK_RPM_PACKAGE_VENDOR\@
-
 \@TMP_RPM_URL\@
 \@TMP_RPM_REQUIRES\@
 \@TMP_RPM_REQUIRES_PRE\@
@@ -2079,10 +1904,10 @@ Vendor:         \@CPACK_RPM_PACKAGE_VENDOR\@
 
 \@TMP_RPM_DEBUGINFO\@
 
-%define _rpmdir %_topdir/RPMS
-%define _srcrpmdir %_topdir/SRPMS
+%define _rpmdir \@CPACK_RPM_DIRECTORY\@
 \@FILE_NAME_DEFINE\@
 %define _unpackaged_files_terminate_build 0
+%define _topdir \@CPACK_RPM_DIRECTORY\@
 \@TMP_RPM_SPEC_INSTALL_POST\@
 \@CPACK_RPM_SPEC_MORE_DEFINE\@
 \@CPACK_RPM_COMPRESSION_TYPE_TMP\@
@@ -2095,14 +1920,16 @@ Vendor:         \@CPACK_RPM_PACKAGE_VENDOR\@
 # We do only save CPack installed tree in _prepr
 # and then restore it in build.
 %prep
-mv $RPM_BUILD_ROOT %_topdir/tmpBBroot
+mv $RPM_BUILD_ROOT \"\@CPACK_TOPLEVEL_DIRECTORY\@/tmpBBroot\"
+
+#p build
 
 %install
 if [ -e $RPM_BUILD_ROOT ];
 then
   rm -rf $RPM_BUILD_ROOT
 fi
-mv %_topdir/tmpBBroot $RPM_BUILD_ROOT
+mv \"\@CPACK_TOPLEVEL_DIRECTORY\@/tmpBBroot\" $RPM_BUILD_ROOT
 
 %clean
 
@@ -2127,10 +1954,7 @@ mv %_topdir/tmpBBroot $RPM_BUILD_ROOT
 
 %changelog
 \@CPACK_RPM_SPEC_CHANGELOG\@
-"
-      )
-    endif()
-
+")
     # Stop here if we were asked to only generate a template USER spec file
     # The generated file may then be used as a template by user who wants
     # to customize their own spec file.
@@ -2156,9 +1980,9 @@ mv %_topdir/tmpBBroot $RPM_BUILD_ROOT
   if(RPMBUILD_EXECUTABLE)
     # Now call rpmbuild using the SPECFILE
     execute_process(
-      COMMAND "${RPMBUILD_EXECUTABLE}" ${RPMBUILD_FLAGS}
+      COMMAND "${RPMBUILD_EXECUTABLE}" -bb
               --define "_topdir ${CPACK_RPM_DIRECTORY}"
-              --buildroot "%_topdir/${CPACK_PACKAGE_FILE_NAME}${CPACK_RPM_PACKAGE_COMPONENT_PART_PATH}" # TODO should I remove this variable? or change the path?
+              --buildroot "${CPACK_RPM_DIRECTORY}/${CPACK_PACKAGE_FILE_NAME}${CPACK_RPM_PACKAGE_COMPONENT_PART_PATH}"
               --target "${CPACK_RPM_PACKAGE_ARCHITECTURE}"
               "${CPACK_RPM_BINARY_SPECFILE}"
       WORKING_DIRECTORY "${CPACK_TOPLEVEL_DIRECTORY}/${CPACK_PACKAGE_FILE_NAME}${CPACK_RPM_PACKAGE_COMPONENT_PART_PATH}"
@@ -2185,8 +2009,7 @@ mv %_topdir/tmpBBroot $RPM_BUILD_ROOT
     # Tell file(GLOB_RECURSE) not to follow directory symlinks
     # even if the project does not set this policy to NEW.
     cmake_policy(SET CMP0009 NEW)
-    file(GLOB_RECURSE GENERATED_FILES "${CPACK_RPM_DIRECTORY}/RPMS/*.rpm"
-      "${CPACK_RPM_DIRECTORY}/SRPMS/*.rpm")
+    file(GLOB_RECURSE GENERATED_FILES "${CPACK_RPM_DIRECTORY}/*.rpm")
   cmake_policy(POP)
 
   if(NOT GENERATED_FILES)
