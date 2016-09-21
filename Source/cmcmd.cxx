@@ -956,6 +956,7 @@ int cmcmd::ExecuteCMakeCommand(std::vector<std::string>& args)
       }
 #else
       static_cast<void>(supportExperimental);
+      static_cast<void>(isDebug);
       cmSystemTools::Error("CMake was not built with server mode enabled");
       return 1;
 #endif
