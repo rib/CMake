@@ -52,6 +52,11 @@
 #include <stdlib.h>
 #include <time.h>
 
+int cmcmd_cmake_ninja_depends(std::vector<std::string>::const_iterator argBeg,
+                              std::vector<std::string>::const_iterator argEnd);
+int cmcmd_cmake_ninja_dyndep(std::vector<std::string>::const_iterator argBeg,
+                             std::vector<std::string>::const_iterator argEnd);
+
 void CMakeCommandUsage(const char* program)
 {
   std::ostringstream errorStream;
@@ -780,6 +785,16 @@ int cmcmd::ExecuteCMakeCommand(std::vector<std::string>& args)
     // Internal CMake link script support.
     else if (args[1] == "cmake_link_script" && args.size() >= 3) {
       return cmcmd::ExecuteLinkScript(args);
+    }
+
+    // Internal CMake ninja dependency scanning support.
+    else if (args[1] == "cmake_ninja_depends") {
+      return cmcmd_cmake_ninja_depends(args.begin() + 2, args.end());
+    }
+
+    // Internal CMake ninja dyndep support.
+    else if (args[1] == "cmake_ninja_dyndep") {
+      return cmcmd_cmake_ninja_dyndep(args.begin() + 2, args.end());
     }
 
     // Internal CMake unimplemented feature notification.
