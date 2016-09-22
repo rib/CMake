@@ -787,6 +787,7 @@ int cmcmd::ExecuteCMakeCommand(std::vector<std::string>& args)
       return cmcmd::ExecuteLinkScript(args);
     }
 
+#ifdef CMAKE_BUILD_WITH_CMAKE
     // Internal CMake ninja dependency scanning support.
     else if (args[1] == "cmake_ninja_depends") {
       return cmcmd_cmake_ninja_depends(args.begin() + 2, args.end());
@@ -796,6 +797,7 @@ int cmcmd::ExecuteCMakeCommand(std::vector<std::string>& args)
     else if (args[1] == "cmake_ninja_dyndep") {
       return cmcmd_cmake_ninja_dyndep(args.begin() + 2, args.end());
     }
+#endif
 
     // Internal CMake unimplemented feature notification.
     else if (args[1] == "cmake_unimplemented_variable") {
