@@ -760,14 +760,32 @@
 #
 # .. note::
 #
-#  Each source path prefix is additionaly suffixed by ``src_${index_}`` where
-#  index_ is index of the path used from :variable:`CPACK_BUILD_SOURCE_DIRS`
-#  variable. This produces ``${CPACK_RPM_BUILD_SOURCE_DIRS_PREFIX}/src_${index_}``
+#  Each source path prefix is additionaly suffixed by ``src_<index>`` where
+#  index is index of the path used from :variable:`CPACK_BUILD_SOURCE_DIRS`
+#  variable. This produces ``<CPACK_RPM_BUILD_SOURCE_DIRS_PREFIX>/src_<index>``
 #  replacement path.
 #  Limitation is that replaced path part must be shorter or of equal
 #  length than the length of its replacement. If that is not the case either
 #  :variable:`CPACK_RPM_BUILD_SOURCE_DIRS_PREFIX` variable has to be set to
 #  a shorter path or source directories must be placed on a longer path.
+#
+# .. variable:: CPACK_RPM_DEBUGINFO_EXCLUDE_DIRS
+#
+#  Directories containing sources that should be excluded from debuginfo packages.
+#
+#  * Mandatory : NO
+#  * Default   : "/usr /usr/src /usr/src/debug"
+#
+#  Listed paths are owned by other RPM packages and should therefore not be
+#  deleted on debuginfo package uninstallation.
+#
+# .. variable:: CPACK_RPM_DEBUGINFO_EXCLUDE_DIRS_ADDITION
+#
+#  Paths that should be appended to :variable:`CPACK_RPM_DEBUGINFO_EXCLUDE_DIRS`
+#  for exclusion.
+#
+#  * Mandatory : NO
+#  * Default   : -
 #
 # Packaging of sources (SRPM)
 # ^^^^^^^^^^^^^^^^^^^^^^^^^^^
