@@ -752,11 +752,13 @@
 #  :variable:`CPACK_BUILD_SOURCE_DIRS` will not be present in debuginfo package.
 #
 # .. variable:: CPACK_RPM_BUILD_SOURCE_DIRS_PREFIX
+#               CPACK_RPM_<component>_BUILD_SOURCE_DIRS_PREFIX
 #
 #  Prefix of location where sources will be placed during package installation.
 #
 #  * Mandatory : YES if :variable:`CPACK_RPM_DEBUGINFO_PACKAGE` is set
-#  * Default   : "/usr/src/debug/${CPACK_PACKAGE_FILE_NAME}"
+#  * Default   : "/usr/src/debug/<CPACK_PACKAGE_FILE_NAME>" and
+#                for component packaging "/usr/src/debug/<CPACK_PACKAGE_FILE_NAME>-<component>"
 #
 # .. note::
 #
@@ -2056,8 +2058,12 @@ function(cpack_rpm_generate_package)
     "CPACK_RPM_${CPACK_RPM_PACKAGE_COMPONENT_UPPER}_DEBUGINFO_PACKAGE"
     "CPACK_RPM_DEBUGINFO_PACKAGE")
   if(CPACK_RPM_DEBUGINFO_PACKAGE)
+    cpack_rpm_variable_fallback("CPACK_RPM_BUILD_SOURCE_DIRS_PREFIX"
+      "CPACK_RPM_${CPACK_RPM_PACKAGE_COMPONENT}_BUILD_SOURCE_DIRS_PREFIX"
+      "CPACK_RPM_${CPACK_RPM_PACKAGE_COMPONENT_UPPER}_BUILD_SOURCE_DIRS_PREFIX"
+      "CPACK_RPM_BUILD_SOURCE_DIRS_PREFIX")
     if(NOT CPACK_RPM_BUILD_SOURCE_DIRS_PREFIX)
-      set(CPACK_RPM_BUILD_SOURCE_DIRS_PREFIX "/usr/src/debug/${CPACK_PACKAGE_FILE_NAME}")
+      set(CPACK_RPM_BUILD_SOURCE_DIRS_PREFIX "/usr/src/debug/${CPACK_PACKAGE_FILE_NAME}${CPACK_RPM_PACKAGE_COMPONENT_PART_PATH}")
     endif()
     cpack_rpm_debugsymbol_check("${CPACK_RPM_INSTALL_FILES}" "${WDIR}")
 
@@ -2373,7 +2379,7 @@ mv %_topdir/tmpBBroot $RPM_BUILD_ROOT
     execute_process(
       COMMAND "${RPMBUILD_EXECUTABLE}" ${RPMBUILD_FLAGS}
               --define "_topdir ${CPACK_RPM_DIRECTORY}"
-              --buildroot "%_topdir/${CPACK_PACKAGE_FILE_NAME}${CPACK_RPM_PACKAGE_COMPONENT_PART_PATH}" # TODO should I remove this variable? or change the path?
+              --buildroot "%_topdir/${CPACK_PACKAGE_FILE_NAME}${CPACK_RPM_PACKAGE_COMPONENT_PART_PATH}"
               --target "${CPACK_RPM_PACKAGE_ARCHITECTURE}"
               "${CPACK_RPM_BINARY_SPECFILE}"
       WORKING_DIRECTORY "${CPACK_TOPLEVEL_DIRECTORY}/${CPACK_PACKAGE_FILE_NAME}${CPACK_RPM_PACKAGE_COMPONENT_PART_PATH}"
