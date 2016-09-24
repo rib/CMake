@@ -752,11 +752,13 @@
 #  :variable:`CPACK_BUILD_SOURCE_DIRS` will not be present in debuginfo package.
 #
 # .. variable:: CPACK_RPM_BUILD_SOURCE_DIRS_PREFIX
+#               CPACK_RPM_<component>_BUILD_SOURCE_DIRS_PREFIX
 #
 #  Prefix of location where sources will be placed during package installation.
 #
 #  * Mandatory : YES if :variable:`CPACK_RPM_DEBUGINFO_PACKAGE` is set
-#  * Default   : "/usr/src/debug/${CPACK_PACKAGE_FILE_NAME}"
+#  * Default   : "/usr/src/debug/<CPACK_PACKAGE_FILE_NAME>" and
+#                for component packaging "/usr/src/debug/<CPACK_PACKAGE_FILE_NAME>-<component>"
 #
 # .. note::
 #
