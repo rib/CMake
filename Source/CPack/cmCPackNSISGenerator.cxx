@@ -75,10 +75,7 @@ int cmCPackNSISGenerator::PackageFiles()
     std::string fileN =
       cmSystemTools::RelativePath(toplevel.c_str(), it->c_str());
     if (!this->Components.empty()) {
-      const size_t pos = fileN.find('/');
-
-      // Strip off the component part of the path.
-      fileN = fileN.substr(pos + 1, std::string::npos);
+      const std::string::size_type pos = fileN.find('/');
 
       // Use the custom component install directory if we have one
       if (pos != std::string::npos) {
@@ -87,6 +84,9 @@ int cmCPackNSISGenerator::PackageFiles()
       } else {
         outputDir = CustomComponentInstallDirectory(fileN);
       }
+
+      // Strip off the component part of the path.
+      fileN = fileN.substr(pos + 1, std::string::npos);
     }
     std::replace(fileN.begin(), fileN.end(), '/', '\\');
 
@@ -122,7 +122,7 @@ int cmCPackNSISGenerator::PackageFiles()
     std::replace(fileN.begin(), fileN.end(), '/', '\\');
 
     const std::string componentOutputDir =
-      CustomComponentInstallDirectory(fileN);
+      CustomComponentInstallDirectory(componentName);
 
     dstr << "  RMDir \"" << componentOutputDir << "\\" << fileN << "\""
          << std::endl;
