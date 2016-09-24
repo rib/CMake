@@ -2,7 +2,9 @@
 
 std::auto_ptr<int> get_auto_ptr()
 {
-  return std::auto_ptr<int>(new int(0));
+  std::auto_ptr<int> ptr;
+  ptr = std::auto_ptr<int>(new int(0));
+  return ptr;
 }
 
 int use_auto_ptr(std::auto_ptr<int> ptr)
