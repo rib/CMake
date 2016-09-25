@@ -1,11 +1,5 @@
 set(CMAKE_BUILD_WITH_INSTALL_RPATH 1)
 
-# PGI compiler doesn't add build id to binaries by default
-if(CMAKE_CXX_COMPILER_ID STREQUAL "PGI")
-  string(APPEND CMAKE_EXE_LINKER_FLAGS "--build-id")
-  string(APPEND CMAKE_SHARED_LINKER_FLAGS "--build-id")
-endif()
-
 set(CPACK_RPM_COMPONENT_INSTALL "ON")
 
 set(CMAKE_BUILD_TYPE Debug)
