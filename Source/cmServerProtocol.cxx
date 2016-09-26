@@ -280,14 +280,18 @@ const cmServerResponse cmServerProtocol1_0::Process(
 {
   assert(this->m_State >= STATE_ACTIVE);
 
-  if (request.Type == kCOMPUTE_TYPE)
+  if (request.Type == kCOMPUTE_TYPE) {
     return this->ProcessCompute(request);
-  if (request.Type == kCONFIGURE_TYPE)
+  }
+  if (request.Type == kCONFIGURE_TYPE) {
     return this->ProcessConfigure(request);
-  if (request.Type == kGLOBAL_SETTINGS_TYPE)
+  }
+  if (request.Type == kGLOBAL_SETTINGS_TYPE) {
     return this->ProcessGlobalSettings(request);
-  if (request.Type == kSET_GLOBAL_SETTINGS_TYPE)
+  }
+  if (request.Type == kSET_GLOBAL_SETTINGS_TYPE) {
     return this->ProcessSetGlobalSettings(request);
+  }
 
   return request.ReportError("Unknown command!");
 }
@@ -312,10 +316,9 @@ cmServerResponse cmServerProtocol1_0::ProcessCompute(
 
   if (ret < 0) {
     return request.ReportError("Failed to compute build system.");
-  } else {
-    m_State = STATE_COMPUTED;
-    return request.Reply(Json::Value());
   }
+  m_State = STATE_COMPUTED;
+  return request.Reply(Json::Value());
 }
 
 cmServerResponse cmServerProtocol1_0::ProcessConfigure(
@@ -399,10 +402,9 @@ cmServerResponse cmServerProtocol1_0::ProcessConfigure(
   int ret = cm->Configure();
   if (ret < 0) {
     return request.ReportError("Configuration failed.");
-  } else {
-    m_State = STATE_CONFIGURED;
-    return request.Reply(Json::Value());
   }
+  m_State = STATE_CONFIGURED;
+  return request.Reply(Json::Value());
 }
 
 cmServerResponse cmServerProtocol1_0::ProcessGlobalSettings(
@@ -437,8 +439,9 @@ cmServerResponse cmServerProtocol1_0::ProcessGlobalSettings(
 static void setBool(const cmServerRequest& request, const std::string& key,
                     std::function<void(bool)> setter)
 {
-  if (request.Data[key].isNull())
+  if (request.Data[key].isNull()) {
     return;
+  }
   setter(request.Data[key].asBool());
 }
 
