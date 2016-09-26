@@ -1,5 +1,5 @@
 CMake - Cross Platform Makefile Generator
-Copyright 2000-2016 Kitware, Inc. and Contributors
+Copyright 2000-2016 Kitware, Inc.
 Copyright 2000-2011 Insight Software Consortium
 All rights reserved.
 
@@ -15,7 +15,7 @@ are met:
   documentation and/or other materials provided with the distribution.
 
 * Neither the names of Kitware, Inc., the Insight Software Consortium,
-  nor the names of their Contributors may be used to endorse or promote
+  nor the names of their contributors may be used to endorse or promote
   products derived from this software without specific prior written
   permission.
 
@@ -35,7 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 The above copyright and license notice applies to distributions of
 CMake in source and binary form.  Some source files contain additional
-notices of original copyright by their Contributors; see each source
+notices of original copyright by their contributors; see each source
 for details.  Third-party software packages supplied with CMake under
 compatible licenses provide their own copyright notices documented in
 corresponding subdirectories.
