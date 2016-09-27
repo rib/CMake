@@ -53,6 +53,7 @@
 
 #=============================================================================
 # Copyright 2001-2009 Kitware, Inc.
+# Copyright 2016 Robert Bragg
 #
 # Distributed under the OSI-approved BSD License (the "License");
 # see accompanying file Copyright.txt for details.
@@ -64,6 +65,37 @@
 # (To distribute this file outside of CMake, substitute the full
 #  License text for the above reference.)
 
+include(FindPkgConfig)
+
+macro(_find_x11_pkg_files_full _pkg_name _name _found_var_name _header _lib)
+  pkg_check_modules(_${_name}_PKG ${_pkg_name})
+  set(X11_${_found_var_name}_FOUND _${_name}_PKG_FOUND)
+
+  if (NOT "${_header}" STREQUAL "_NONE")
+    #message("include dirs = ${_${_name}_PKG_INCLUDE_DIRS}")
+    find_path(X11_${_name}_INCLUDE_PATH ${_header} ${_${_name}_PKG_INCLUDE_DIRS} NO_DEFAULT_PATH)
+    find_path(X11_${_name}_INCLUDE_PATH ${_header} ${_${_name}_PKG_INCLUDE_DIRS})
+    #message("X11_${_name}_INCLUDE_PATH: ${X11_${_name}_INCLUDE_PATH}")
+  endif()
+
+  if (NOT "${_lib}" STREQUAL "_NONE")
+    #message("lib dirs = ${_${_name}_LIBRARY_DIRS}")
+    find_library(X11_${_lib}_LIB ${_lib} ${_${_name}_PKG_LIBRARY_DIRS} NO_DEFAULT_PATH)
+    find_library(X11_${_lib}_LIB ${_lib} ${_${_name}_PKG_LIBRARY_DIRS})
+    #message("X11_${_lib}_LIB: ${X11_${_lib}_LIB}")
+  endif()
+endmacro()
+
+macro(_find_x11_pkg_files _pkg_name _name _header _lib)
+  _find_x11_pkg_files_full(${_pkg_name} ${_name} ${_name} ${_header} ${_lib})
+endmacro()
+
+macro(_find_x11_pkg_files_simple _name)
+  string(TOLOWER ${_name} _pkg_name)
+  _find_x11_pkg_files_full(${_pkg_name} ${_name} ${_name} "X11/extensions/${_name}.h" ${_name})
+endmacro()
+
+
 if (UNIX)
   set(X11_FOUND 0)
   # X11 is never a framework and some header files may be
@@ -72,95 +104,150 @@ if (UNIX)
   set(CMAKE_FIND_FRAMEWORK NEVER)
   set(CMAKE_REQUIRED_QUIET_SAVE ${CMAKE_REQUIRED_QUIET})
   set(CMAKE_REQUIRED_QUIET ${X11_FIND_QUIETLY})
-  set(X11_INC_SEARCH_PATH
-    /usr/pkg/xorg/include
-    /usr/X11R6/include
-    /usr/X11R7/include
-    /usr/include/X11
-    /usr/openwin/include
-    /usr/openwin/share/include
-    /opt/graphics/OpenGL/include
-    /opt/X11/include
-  )
 
-  set(X11_LIB_SEARCH_PATH
-    /usr/pkg/xorg/lib
-    /usr/X11R6/lib
-    /usr/X11R7/lib
-    /usr/openwin/lib
-    /opt/X11/lib
-  )
+  if (PKG_CONFIG_FOUND)
 
-  find_path(X11_X11_INCLUDE_PATH X11/X.h                             ${X11_INC_SEARCH_PATH})
-  find_path(X11_Xlib_INCLUDE_PATH X11/Xlib.h                         ${X11_INC_SEARCH_PATH})
+    #LINUX...
 
-  # Look for includes; keep the list sorted by name of the cmake *_INCLUDE_PATH
-  # variable (which doesn't need to match the include file name).
+    pkg_check_modules(_X11_PKG x11)
 
-  # Solaris lacks XKBrules.h, so we should skip kxkbd there.
-  find_path(X11_ICE_INCLUDE_PATH X11/ICE/ICE.h                       ${X11_INC_SEARCH_PATH})
-  find_path(X11_SM_INCLUDE_PATH X11/SM/SM.h                          ${X11_INC_SEARCH_PATH})
-  find_path(X11_Xaccessrules_INCLUDE_PATH X11/extensions/XKBrules.h  ${X11_INC_SEARCH_PATH})
-  find_path(X11_Xaccessstr_INCLUDE_PATH X11/extensions/XKBstr.h      ${X11_INC_SEARCH_PATH})
-  find_path(X11_Xau_INCLUDE_PATH X11/Xauth.h                         ${X11_INC_SEARCH_PATH})
-  find_path(X11_Xcomposite_INCLUDE_PATH X11/extensions/Xcomposite.h  ${X11_INC_SEARCH_PATH})
-  find_path(X11_Xcursor_INCLUDE_PATH X11/Xcursor/Xcursor.h           ${X11_INC_SEARCH_PATH})
-  find_path(X11_Xdamage_INCLUDE_PATH X11/extensions/Xdamage.h        ${X11_INC_SEARCH_PATH})
-  find_path(X11_Xdmcp_INCLUDE_PATH X11/Xdmcp.h                       ${X11_INC_SEARCH_PATH})
-  find_path(X11_dpms_INCLUDE_PATH X11/extensions/dpms.h              ${X11_INC_SEARCH_PATH})
-  find_path(X11_xf86misc_INCLUDE_PATH X11/extensions/xf86misc.h      ${X11_INC_SEARCH_PATH})
-  find_path(X11_xf86vmode_INCLUDE_PATH X11/extensions/xf86vmode.h    ${X11_INC_SEARCH_PATH})
-  find_path(X11_Xfixes_INCLUDE_PATH X11/extensions/Xfixes.h          ${X11_INC_SEARCH_PATH})
-  find_path(X11_Xft_INCLUDE_PATH X11/Xft/Xft.h                       ${X11_INC_SEARCH_PATH})
-  find_path(X11_Xi_INCLUDE_PATH X11/extensions/XInput.h              ${X11_INC_SEARCH_PATH})
-  find_path(X11_Xinerama_INCLUDE_PATH X11/extensions/Xinerama.h      ${X11_INC_SEARCH_PATH})
-  find_path(X11_Xinput_INCLUDE_PATH X11/extensions/XInput.h          ${X11_INC_SEARCH_PATH})
-  find_path(X11_Xkb_INCLUDE_PATH X11/extensions/XKB.h                ${X11_INC_SEARCH_PATH})
-  find_path(X11_Xkblib_INCLUDE_PATH X11/XKBlib.h                     ${X11_INC_SEARCH_PATH})
-  find_path(X11_Xkbfile_INCLUDE_PATH X11/extensions/XKBfile.h        ${X11_INC_SEARCH_PATH})
-  find_path(X11_Xmu_INCLUDE_PATH X11/Xmu/Xmu.h                       ${X11_INC_SEARCH_PATH})
-  find_path(X11_Xpm_INCLUDE_PATH X11/xpm.h                           ${X11_INC_SEARCH_PATH})
-  find_path(X11_XTest_INCLUDE_PATH X11/extensions/XTest.h            ${X11_INC_SEARCH_PATH})
-  find_path(X11_XShm_INCLUDE_PATH X11/extensions/XShm.h              ${X11_INC_SEARCH_PATH})
-  find_path(X11_Xrandr_INCLUDE_PATH X11/extensions/Xrandr.h          ${X11_INC_SEARCH_PATH})
-  find_path(X11_Xrender_INCLUDE_PATH X11/extensions/Xrender.h        ${X11_INC_SEARCH_PATH})
-  find_path(X11_XRes_INCLUDE_PATH X11/extensions/XRes.h              ${X11_INC_SEARCH_PATH})
-  find_path(X11_Xscreensaver_INCLUDE_PATH X11/extensions/scrnsaver.h ${X11_INC_SEARCH_PATH})
-  find_path(X11_Xshape_INCLUDE_PATH X11/extensions/shape.h           ${X11_INC_SEARCH_PATH})
-  find_path(X11_Xutil_INCLUDE_PATH X11/Xutil.h                       ${X11_INC_SEARCH_PATH})
-  find_path(X11_Xt_INCLUDE_PATH X11/Intrinsic.h                      ${X11_INC_SEARCH_PATH})
-  find_path(X11_Xv_INCLUDE_PATH X11/extensions/Xvlib.h               ${X11_INC_SEARCH_PATH})
-  find_path(X11_XSync_INCLUDE_PATH X11/extensions/sync.h             ${X11_INC_SEARCH_PATH})
+    if (_X11_PKG_FOUND)
+      find_path(X11_X11_INCLUDE_PATH X11/X.h ${_X11_PKG_INCLUDE_DIRS} NO_DEFAULT_PATH)
+      find_path(X11_X11_INCLUDE_PATH X11/X.h ${_X11_PKG_INCLUDE_DIRS})
+
+      # _find_x11_pkg_files(<name> <header> <libname> <pkg-name>)
+
+      _find_x11_pkg_files(ice ICU X11/ICE/ICE.h ICE)
+      _find_x11_pkg_files(sm SM X11/SM/SM.h SM)
+      _find_x11_pkg_files(x11 Xlib X11/Xlib.h X11)
+      _find_x11_pkg_files_full(xkbfile Xaccessrules Xaccess X11/extensions/XKBrules.h _NONE)
+      _find_x11_pkg_files_full(kbproto Xaccessstr Xaccess X11/extensions/XKBstr.h _NONE)
+      _find_x11_pkg_files(xau Xau X11/Xauth.h Xau)
+      _find_x11_pkg_files_simple(Xcomposite)
+      _find_x11_pkg_files(xcursor Xcursor X11/Xcursor/Xcursor.h Xcursor)
+      _find_x11_pkg_files_simple(Xdamage)
+      _find_x11_pkg_files(xdmcp Xdmcp X11/Xdmcp.h Xdmcp)
+      _find_x11_pkg_files(xext Xext _NONE Xext)
+      _find_x11_pkg_files(xext dpms X11/extensions/dpms.h _NONE)
+      _find_x11_pkg_files(xext XShm X11/extensions/XShm.h _NONE)
+      _find_x11_pkg_files(xext Xshape X11/extensions/shape.h _NONE)
+      _find_x11_pkg_files(xext Xsync X11/extensions/sync.h _NONE)
+      _find_x11_pkg_files(xxf86misc xf86misc X11/extensions/xf86misc.h Xxf86misc)
+      _find_x11_pkg_files(xxf86vm xf86vmode X11/extensions/xf86vmode.h Xxf86vm)
+      _find_x11_pkg_files_simple(Xfixes)
+      _find_x11_pkg_files(xft Xft X11/Xft/Xft.h Xft)
+      _find_x11_pkg_files(xi Xi X11/extensions/XInput.h Xi)
+      _find_x11_pkg_files(xi Xinput X11/extensions/XInput.h Xi)
+      _find_x11_pkg_files_simple(Xinerama)
+      _find_x11_pkg_files(kbproto Xkb X11/extensions/XKB.h _NONE)
+      _find_x11_pkg_files(x11 Xkblib X11/XKBlib.h _NONE)
+      _find_x11_pkg_files(xkbfile Xkbfile X11/extensions/XKBfile.h xkbfile)
+      _find_x11_pkg_files(xmu Xmu X11/Xmu/Xmu.h Xmu)
+      _find_x11_pkg_files(xpm Xpm X11/Xpm/Xpm.h Xpm)
+      _find_x11_pkg_files(xtst XTest X11/extensions/XTest.h Xtst)
+      _find_x11_pkg_files_simple(Xrandr)
+      _find_x11_pkg_files_simple(Xrender)
+      _find_x11_pkg_files_simple(XRes)
+      _find_x11_pkg_files(xscrnsaver Xscreensaver X11/extensions/scrnsaver.h Xss)
+      _find_x11_pkg_files(x11 Xutil X11/Xutil.h _NONE)
+      _find_x11_pkg_files(xt Xt X11/Intrinsic.h Xt)
+      _find_x11_pkg_files(xv Xv X11/extensions/Xvlib.h Xv)
+    endif()
+
+  else()
+    # UNIX without pkg-config...
+
+    set(X11_INC_SEARCH_PATH
+      /usr/pkg/xorg/include
+      /usr/X11R6/include
+      /usr/X11R7/include
+      /usr/include/X11
+      /usr/openwin/include
+      /usr/openwin/share/include
+      /opt/graphics/OpenGL/include
+      /opt/X11/include
+    )
+
+    set(X11_LIB_SEARCH_PATH
+      /usr/pkg/xorg/lib
+      /usr/X11R6/lib
+      /usr/X11R7/lib
+      /usr/openwin/lib
+      /opt/X11/lib
+    )
+
+    find_path(X11_X11_INCLUDE_PATH X11/X.h                             ${X11_INC_SEARCH_PATH})
+    find_path(X11_Xlib_INCLUDE_PATH X11/Xlib.h                         ${X11_INC_SEARCH_PATH})
+
+    # Look for includes; keep the list sorted by name of the cmake *_INCLUDE_PATH
+    # variable (which doesn't need to match the include file name).
+
+    # Solaris lacks XKBrules.h, so we should skip kxkbd there.
+    find_path(X11_ICE_INCLUDE_PATH X11/ICE/ICE.h                       ${X11_INC_SEARCH_PATH})
+    find_path(X11_SM_INCLUDE_PATH X11/SM/SM.h                          ${X11_INC_SEARCH_PATH})
+    find_path(X11_Xaccessrules_INCLUDE_PATH X11/extensions/XKBrules.h  ${X11_INC_SEARCH_PATH})
+    find_path(X11_Xaccessstr_INCLUDE_PATH X11/extensions/XKBstr.h      ${X11_INC_SEARCH_PATH})
+    find_path(X11_Xau_INCLUDE_PATH X11/Xauth.h                         ${X11_INC_SEARCH_PATH})
+    find_path(X11_Xcomposite_INCLUDE_PATH X11/extensions/Xcomposite.h  ${X11_INC_SEARCH_PATH})
+    find_path(X11_Xcursor_INCLUDE_PATH X11/Xcursor/Xcursor.h           ${X11_INC_SEARCH_PATH})
+    find_path(X11_Xdamage_INCLUDE_PATH X11/extensions/Xdamage.h        ${X11_INC_SEARCH_PATH})
+    find_path(X11_Xdmcp_INCLUDE_PATH X11/Xdmcp.h                       ${X11_INC_SEARCH_PATH})
+    find_path(X11_dpms_INCLUDE_PATH X11/extensions/dpms.h              ${X11_INC_SEARCH_PATH})
+    find_path(X11_xf86misc_INCLUDE_PATH X11/extensions/xf86misc.h      ${X11_INC_SEARCH_PATH})
+    find_path(X11_xf86vmode_INCLUDE_PATH X11/extensions/xf86vmode.h    ${X11_INC_SEARCH_PATH})
+    find_path(X11_Xfixes_INCLUDE_PATH X11/extensions/Xfixes.h          ${X11_INC_SEARCH_PATH})
+    find_path(X11_Xft_INCLUDE_PATH X11/Xft/Xft.h                       ${X11_INC_SEARCH_PATH})
+    find_path(X11_Xi_INCLUDE_PATH X11/extensions/XInput.h              ${X11_INC_SEARCH_PATH})
+    find_path(X11_Xinerama_INCLUDE_PATH X11/extensions/Xinerama.h      ${X11_INC_SEARCH_PATH})
+    find_path(X11_Xinput_INCLUDE_PATH X11/extensions/XInput.h          ${X11_INC_SEARCH_PATH})
+    find_path(X11_Xkb_INCLUDE_PATH X11/extensions/XKB.h                ${X11_INC_SEARCH_PATH})
+    find_path(X11_Xkblib_INCLUDE_PATH X11/XKBlib.h                     ${X11_INC_SEARCH_PATH})
+    find_path(X11_Xkbfile_INCLUDE_PATH X11/extensions/XKBfile.h        ${X11_INC_SEARCH_PATH})
+    find_path(X11_Xmu_INCLUDE_PATH X11/Xmu/Xmu.h                       ${X11_INC_SEARCH_PATH})
+    find_path(X11_Xpm_INCLUDE_PATH X11/xpm.h                           ${X11_INC_SEARCH_PATH})
+    find_path(X11_XTest_INCLUDE_PATH X11/extensions/XTest.h            ${X11_INC_SEARCH_PATH})
+    find_path(X11_XShm_INCLUDE_PATH X11/extensions/XShm.h              ${X11_INC_SEARCH_PATH})
+    find_path(X11_Xrandr_INCLUDE_PATH X11/extensions/Xrandr.h          ${X11_INC_SEARCH_PATH})
+    find_path(X11_Xrender_INCLUDE_PATH X11/extensions/Xrender.h        ${X11_INC_SEARCH_PATH})
+    find_path(X11_XRes_INCLUDE_PATH X11/extensions/XRes.h              ${X11_INC_SEARCH_PATH})
+    find_path(X11_Xscreensaver_INCLUDE_PATH X11/extensions/scrnsaver.h ${X11_INC_SEARCH_PATH})
+    find_path(X11_Xshape_INCLUDE_PATH X11/extensions/shape.h           ${X11_INC_SEARCH_PATH})
+    find_path(X11_Xutil_INCLUDE_PATH X11/Xutil.h                       ${X11_INC_SEARCH_PATH})
+    find_path(X11_Xt_INCLUDE_PATH X11/Intrinsic.h                      ${X11_INC_SEARCH_PATH})
+    find_path(X11_Xv_INCLUDE_PATH X11/extensions/Xvlib.h               ${X11_INC_SEARCH_PATH})
+    find_path(X11_XSync_INCLUDE_PATH X11/extensions/sync.h             ${X11_INC_SEARCH_PATH})
 
 
-  find_library(X11_X11_LIB X11               ${X11_LIB_SEARCH_PATH})
+    find_library(X11_X11_LIB X11               ${X11_LIB_SEARCH_PATH})
 
-  # Find additional X libraries. Keep list sorted by library name.
-  find_library(X11_ICE_LIB ICE               ${X11_LIB_SEARCH_PATH})
-  find_library(X11_SM_LIB SM                 ${X11_LIB_SEARCH_PATH})
-  find_library(X11_Xau_LIB Xau               ${X11_LIB_SEARCH_PATH})
-  find_library(X11_Xcomposite_LIB Xcomposite ${X11_LIB_SEARCH_PATH})
-  find_library(X11_Xcursor_LIB Xcursor       ${X11_LIB_SEARCH_PATH})
-  find_library(X11_Xdamage_LIB Xdamage       ${X11_LIB_SEARCH_PATH})
-  find_library(X11_Xdmcp_LIB Xdmcp           ${X11_LIB_SEARCH_PATH})
-  find_library(X11_Xext_LIB Xext             ${X11_LIB_SEARCH_PATH})
-  find_library(X11_Xfixes_LIB Xfixes         ${X11_LIB_SEARCH_PATH})
-  find_library(X11_Xft_LIB Xft               ${X11_LIB_SEARCH_PATH})
-  find_library(X11_Xi_LIB Xi                 ${X11_LIB_SEARCH_PATH})
-  find_library(X11_Xinerama_LIB Xinerama     ${X11_LIB_SEARCH_PATH})
-  find_library(X11_Xinput_LIB Xi             ${X11_LIB_SEARCH_PATH})
-  find_library(X11_Xkbfile_LIB xkbfile       ${X11_LIB_SEARCH_PATH})
-  find_library(X11_Xmu_LIB Xmu               ${X11_LIB_SEARCH_PATH})
-  find_library(X11_Xpm_LIB Xpm               ${X11_LIB_SEARCH_PATH})
-  find_library(X11_Xrandr_LIB Xrandr         ${X11_LIB_SEARCH_PATH})
-  find_library(X11_Xrender_LIB Xrender       ${X11_LIB_SEARCH_PATH})
-  find_library(X11_XRes_LIB XRes             ${X11_LIB_SEARCH_PATH})
-  find_library(X11_Xscreensaver_LIB Xss      ${X11_LIB_SEARCH_PATH})
-  find_library(X11_Xt_LIB Xt                 ${X11_LIB_SEARCH_PATH})
-  find_library(X11_XTest_LIB Xtst            ${X11_LIB_SEARCH_PATH})
-  find_library(X11_Xv_LIB Xv                 ${X11_LIB_SEARCH_PATH})
-  find_library(X11_Xxf86misc_LIB Xxf86misc   ${X11_LIB_SEARCH_PATH})
-  find_library(X11_Xxf86vm_LIB Xxf86vm       ${X11_LIB_SEARCH_PATH})
+    # Find additional X libraries. Keep list sorted by library name.
+    find_library(X11_ICE_LIB ICE               ${X11_LIB_SEARCH_PATH})
+    find_library(X11_SM_LIB SM                 ${X11_LIB_SEARCH_PATH})
+    find_library(X11_Xau_LIB Xau               ${X11_LIB_SEARCH_PATH})
+    find_library(X11_Xcomposite_LIB Xcomposite ${X11_LIB_SEARCH_PATH})
+    find_library(X11_Xcursor_LIB Xcursor       ${X11_LIB_SEARCH_PATH})
+    find_library(X11_Xdamage_LIB Xdamage       ${X11_LIB_SEARCH_PATH})
+    find_library(X11_Xdmcp_LIB Xdmcp           ${X11_LIB_SEARCH_PATH})
+    find_library(X11_Xext_LIB Xext             ${X11_LIB_SEARCH_PATH})
+    find_library(X11_Xfixes_LIB Xfixes         ${X11_LIB_SEARCH_PATH})
+    find_library(X11_Xft_LIB Xft               ${X11_LIB_SEARCH_PATH})
+    find_library(X11_Xi_LIB Xi                 ${X11_LIB_SEARCH_PATH})
+    find_library(X11_Xinerama_LIB Xinerama     ${X11_LIB_SEARCH_PATH})
+    find_library(X11_Xinput_LIB Xi             ${X11_LIB_SEARCH_PATH})
+    find_library(X11_Xkbfile_LIB xkbfile       ${X11_LIB_SEARCH_PATH})
+    find_library(X11_Xmu_LIB Xmu               ${X11_LIB_SEARCH_PATH})
+    find_library(X11_Xpm_LIB Xpm               ${X11_LIB_SEARCH_PATH})
+    find_library(X11_Xrandr_LIB Xrandr         ${X11_LIB_SEARCH_PATH})
+    find_library(X11_Xrender_LIB Xrender       ${X11_LIB_SEARCH_PATH})
+    find_library(X11_XRes_LIB XRes             ${X11_LIB_SEARCH_PATH})
+    find_library(X11_Xscreensaver_LIB Xss      ${X11_LIB_SEARCH_PATH})
+    find_library(X11_Xt_LIB Xt                 ${X11_LIB_SEARCH_PATH})
+    find_library(X11_XTest_LIB Xtst            ${X11_LIB_SEARCH_PATH})
+    find_library(X11_Xv_LIB Xv                 ${X11_LIB_SEARCH_PATH})
+    find_library(X11_Xxf86misc_LIB Xxf86misc   ${X11_LIB_SEARCH_PATH})
+    find_library(X11_Xxf86vm_LIB Xxf86vm       ${X11_LIB_SEARCH_PATH})
+
+  endif()
 
   set(X11_LIBRARY_DIR "")
   if(X11_X11_LIB)
