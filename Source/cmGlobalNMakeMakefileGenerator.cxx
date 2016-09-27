@@ -30,12 +30,14 @@ cmGlobalNMakeMakefileGenerator::cmGlobalNMakeMakefileGenerator(cmake* cm)
 }
 
 void cmGlobalNMakeMakefileGenerator::EnableLanguage(
-  std::vector<std::string> const& l, cmMakefile* mf, bool optional)
+  std::vector<std::string> const& l, cmMakefile* mf, bool optional,
+  bool internal)
 {
   // pick a default
   mf->AddDefinition("CMAKE_GENERATOR_CC", "cl");
   mf->AddDefinition("CMAKE_GENERATOR_CXX", "cl");
-  this->cmGlobalUnixMakefileGenerator3::EnableLanguage(l, mf, optional);
+  this->cmGlobalUnixMakefileGenerator3::EnableLanguage(l, mf, optional,
+                                                       internal);
 }
 
 void cmGlobalNMakeMakefileGenerator::GetDocumentation(

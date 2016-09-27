@@ -125,7 +125,8 @@ std::string cmGlobalVisualStudio8Generator::FindDevEnvCommand()
 }
 
 void cmGlobalVisualStudio8Generator::EnableLanguage(
-  std::vector<std::string> const& lang, cmMakefile* mf, bool optional)
+  std::vector<std::string> const& lang, cmMakefile* mf, bool optional,
+  bool internal)
 {
   for (std::vector<std::string>::const_iterator it = lang.begin();
        it != lang.end(); ++it) {
@@ -134,7 +135,7 @@ void cmGlobalVisualStudio8Generator::EnableLanguage(
     }
   }
   this->AddPlatformDefinitions(mf);
-  cmGlobalVisualStudio7Generator::EnableLanguage(lang, mf, optional);
+  cmGlobalVisualStudio7Generator::EnableLanguage(lang, mf, optional, internal);
 }
 
 void cmGlobalVisualStudio8Generator::AddPlatformDefinitions(cmMakefile* mf)

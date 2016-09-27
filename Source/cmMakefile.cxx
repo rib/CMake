@@ -3147,11 +3147,11 @@ cmSourceFile* cmMakefile::GetOrCreateSource(const std::string& sourceName,
 }
 
 void cmMakefile::EnableLanguage(std::vector<std::string> const& lang,
-                                bool optional)
+                                bool optional, bool internal)
 {
   this->AddDefinition("CMAKE_CFG_INTDIR",
                       this->GetGlobalGenerator()->GetCMakeCFGIntDir());
-  this->GetGlobalGenerator()->EnableLanguage(lang, this, optional);
+  this->GetGlobalGenerator()->EnableLanguage(lang, this, optional, internal);
 }
 
 int cmMakefile::TryCompile(const std::string& srcdir,

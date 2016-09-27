@@ -31,13 +31,15 @@ cmGlobalBorlandMakefileGenerator::cmGlobalBorlandMakefileGenerator(cmake* cm)
 }
 
 void cmGlobalBorlandMakefileGenerator::EnableLanguage(
-  std::vector<std::string> const& l, cmMakefile* mf, bool optional)
+  std::vector<std::string> const& l, cmMakefile* mf, bool optional,
+  bool internal)
 {
   std::string outdir = this->CMakeInstance->GetHomeOutputDirectory();
   mf->AddDefinition("BORLAND", "1");
   mf->AddDefinition("CMAKE_GENERATOR_CC", "bcc32");
   mf->AddDefinition("CMAKE_GENERATOR_CXX", "bcc32");
-  this->cmGlobalUnixMakefileGenerator3::EnableLanguage(l, mf, optional);
+  this->cmGlobalUnixMakefileGenerator3::EnableLanguage(l, mf, optional,
+                                                       internal);
 }
 
 ///! Create a local generator appropriate to this Global Generator
