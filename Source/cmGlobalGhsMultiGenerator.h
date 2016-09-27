@@ -61,8 +61,8 @@ public:
   * Try to determine system information such as shared library
   * extension, pthreads, byte order etc.
   */
-  virtual void EnableLanguage(std::vector<std::string> const& languages,
-                              cmMakefile*, bool optional);
+  void EnableLanguage(std::vector<std::string> const& languages, cmMakefile*,
+                      bool optional, bool internal) CM_OVERRIDE;
   /*
   * Determine what program to use for building the project.
   */

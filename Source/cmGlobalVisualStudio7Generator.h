@@ -57,8 +57,8 @@ public:
    * Try to determine system information such as shared library
    * extension, pthreads, byte order etc.
    */
-  virtual void EnableLanguage(std::vector<std::string> const& languages,
-                              cmMakefile*, bool optional);
+  void EnableLanguage(std::vector<std::string> const& languages, cmMakefile*,
+                      bool optional, bool internal) CM_OVERRIDE;
 
   /**
    * Try running cmake and building a file. This is used for dynamically

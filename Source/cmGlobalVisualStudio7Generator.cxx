@@ -100,7 +100,8 @@ const char* cmGlobalVisualStudio7Generator::GetIntelProjectVersion()
 }
 
 void cmGlobalVisualStudio7Generator::EnableLanguage(
-  std::vector<std::string> const& lang, cmMakefile* mf, bool optional)
+  std::vector<std::string> const& lang, cmMakefile* mf, bool optional,
+  bool internal)
 {
   mf->AddDefinition("CMAKE_GENERATOR_RC", "rc");
   mf->AddDefinition("CMAKE_GENERATOR_NO_COMPILER_ENV", "1");
@@ -114,7 +115,7 @@ void cmGlobalVisualStudio7Generator::EnableLanguage(
   }
 
   // Create list of configurations requested by user's cache, if any.
-  this->cmGlobalGenerator::EnableLanguage(lang, mf, optional);
+  this->cmGlobalGenerator::EnableLanguage(lang, mf, optional, internal);
 
   // if this environment variable is set, then copy it to
   // a static cache entry.  It will be used by

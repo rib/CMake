@@ -371,7 +371,8 @@ bool cmGlobalGenerator::CheckLanguages(
 //
 
 void cmGlobalGenerator::EnableLanguage(
-  std::vector<std::string> const& languages, cmMakefile* mf, bool optional)
+  std::vector<std::string> const& languages, cmMakefile* mf, bool optional,
+  bool internal)
 {
   if (languages.empty()) {
     cmSystemTools::Error("EnableLanguage must have a lang specified!");
@@ -379,6 +380,7 @@ void cmGlobalGenerator::EnableLanguage(
     return;
   }
 
+  static_cast<void>(internal);
   std::set<std::string> cur_languages(languages.begin(), languages.end());
   for (std::set<std::string>::iterator li = cur_languages.begin();
        li != cur_languages.end(); ++li) {
