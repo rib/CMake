@@ -380,11 +380,12 @@ void cmGlobalGenerator::EnableLanguage(
     return;
   }
 
-  static_cast<void>(internal);
-  std::set<std::string> cur_languages(languages.begin(), languages.end());
-  for (std::set<std::string>::iterator li = cur_languages.begin();
-       li != cur_languages.end(); ++li) {
-    if (!this->LanguagesInProgress.insert(*li).second) {
+  std::set<std::string> cur_languages;
+  for (std::vector<std::string>::const_iterator li = languages.begin();
+       li != languages.end(); ++li) {
+    if (this->LanguagesInProgress.insert(*li).second) {
+      cur_languages.insert(*li);
+    } else if (!internal) {
       std::ostringstream e;
       e << "Language '" << *li << "' is currently being enabled.  "
                                   "Recursive call not allowed.";
